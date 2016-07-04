@@ -11,7 +11,7 @@
       "watch": true,
       "merge_logs": true,
       "env": {
-        "SERVER_URL": "http://localhost:1337/parse",
+        "SERVER_URL": "https://photogramapp.com/parse",
         // DEFINES
         "MONGOLAB_URI": "mongodb://localhost/photogram",
         "APP_NAME": "Photogram",
@@ -19,9 +19,9 @@
         "MASTER_KEY": "myMasterKey",
         "MASTER_REST_KEY": "MPhotogramMasterKey",
         // S3
-        "AWS_ACCESS_KEY_ID": "AKIAJ2PRIH7MX5SKEDNQ",
-        "AWS_SECRET_ACCESS_KEY": "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",
-        "BUCKET_NAME": "photogram-s3",
+//        "AWS_ACCESS_KEY_ID": "AKIAJ2PRIH7MX5SKEDNQ",
+//        "AWS_SECRET_ACCESS_KEY": "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",
+//        "BUCKET_NAME": "photogram-s3",
         //MAILGUN EMAIL
         "MAILGUN_API_KEY": "key-3a05e956706a4bd579982460b96cf43a",
         "MAILGUN_DOMAIN": "",
