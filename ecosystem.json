@@ -30,24 +30,11 @@
         // You can use any arbitrary string. Keep it secret! For migrated apps, this should match your hosted Parse app.
         "MASTER_KEY": "myMasterKey",
         "MASTER_REST_KEY": "MPhotogramMasterKey",
-
-        // S3
-//        "AWS_ACCESS_KEY_ID": "AKIAJ2PRIH7MX5SKEDNQ",
-//        "AWS_SECRET_ACCESS_KEY": "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",
-//        "BUCKET_NAME": "photogram-s3",
-        //MAILGUN EMAIL
-        "MAILGUN_API_KEY": "key-3a05e956706a4bd579982460b96cf43a",
-        "MAILGUN_DOMAIN": "",
-        "MAILGUN_FROM_ADDRESS": "",
         
-        // ONE SIGNAL PUSH
-        "ONE_SIGNAL_APP_ID": "d13d00d0-013f-406f-9811-66ce0737d7bc",
-        "ONE_SIGNAL_REST_API_KEY": "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl",
-
         // (required) - The master key to use for overriding ACL security.
         // You can use any arbitrary string. Keep it secret! For migrated apps, this should match your hosted Parse app.
         "DASHBOARD_USER": "admin",
-        "DASHBOARD_PASSWORD": "admin123"
+        "DASHBOARD_PASSWORD": "admin123",
 
         // (optional) - S3 for Storage Files
         // Files are hosted via automaticamentes GridStore Adapter in MongoDB
@@ -62,8 +49,8 @@
         //"MAILGUN_FROM_ADDRESS": "",
 
         // (optional) - ONE SIGNAL for Send Push Notifications
-        //"ONE_SIGNAL_APP_ID": "",
-        //"ONE_SIGNAL_REST_API_KEY": ""
+        "ONE_SIGNAL_APP_ID": "d13d00d0-013f-406f-9811-66ce0737d7bc",
+        "ONE_SIGNAL_REST_API_KEY": "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl",
       }
     }
   ]
