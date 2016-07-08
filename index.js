@@ -2,6 +2,7 @@
 const express              = require('express');
 const cors                 = require('cors');
 const ParseServer          = require('parse-server').ParseServer;
+const ParseDashboard       = require('parse-dashboard');
 const expressLayouts       = require('express-ejs-layouts');
 const path                 = require('path');
 const OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
@@ -11,16 +12,13 @@ const S3Adapter            = require('parse-server').S3Adapter;
 // Parse configuration
 const PORT            = process.env.PORT || 1337;
 const DATABASE_URI    = process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://localhost:27017/dev';
-const SERVER_URL      = process.env.SERVER_URL || 'http://localhost:1337';
+const SERVER_URL      = process.env.SERVER_URL || 'http://localhost:1337/parse';
 const APP_ID          = process.env.APP_ID || 'myAppId';
 const MASTER_KEY      = process.env.MASTER_KEY || 'myMasterKey';
 const MASTER_REST_KEY = process.env.MASTER_REST_KEY || 'myRestApiKey';
 const APP_NAME        = process.env.APP_NAME || 'photogram';
 const PARSE_MOUNT     = process.env.PARSE_MOUNT || '/parse';
-const CLOUD_CODE_MAIN = 'app/' + process.env.FOLDER + '/cloud/main.js';
-const EJS_FOLDER      = 'app/' + process.env.FOLDER + '/' + process.env.EJS_FOLDER;
-const SERVER_HOST     = process.env.SERVER_HOST || SERVER_URL + ':' + PORT + PARSE_MOUNT;
-const LIVE_QUERY      = process.env.LIVE_QUERY;
+const CLOUD_CODE_MAIN = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js';
 
 // Database Ecosystem file
 if (!DATABASE_URI) {
@@ -32,26 +30,21 @@ let ServerConfig = {
     cloud           : CLOUD_CODE_MAIN,
     appId           : APP_ID,
     masterKey       : MASTER_KEY,
-    serverURL       : SERVER_HOST,
+    serverURL       : SERVER_URL,
     restAPIKey      : MASTER_REST_KEY,
     verifyUserEmails: false,
     publicServerURL : SERVER_URL,
     appName         : APP_NAME,
-    logLevel        : 'VERBOSE'
+    //liveQuery       : {
+    //    classNames: ['GalleryComment']
+    //},
 };
 
-// Live Query
-if (LIVE_QUERY) {
-    ServerConfig.liveQuery = {
-        classNames: JSON.parse(LIVE_QUERY)
-    }
-}
-
 // File Local
-const UPLOAD_LOCAL = process.env.UPLOAD_LOCAL;
-if (UPLOAD_LOCAL) {
+const UPLOAD_LOCAL_PATH = process.env.UPLOAD_LOCAL_PATH;
+if (UPLOAD_LOCAL_PATH) {
     ServerConfig.filesAdapter = new FSFilesAdapter({
-        filesSubDirectory: 'app/' + process.env.FOLDER + '/upload/'
+        filesSubDirectory: UPLOAD_LOCAL_PATH
     });
 }
 
@@ -104,29 +97,56 @@ const app = express();
 // Cors
 app.use(cors());
 
-//
-app.use((req, res, next) => {
-    res.locals.appId     = APP_ID;
-    res.locals.serverUrl = SERVER_HOST;
-    next();
-});
-
 // EJS Template
-if (EJS_FOLDER) {
-    app.set('view engine', 'ejs');
-    app.set('views', EJS_FOLDER);
-    app.use(expressLayouts);
-    app.use(express.static(EJS_FOLDER));
-    app.get('/', (req, res) => res.render('index'));
-}
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
 // Serve the Parse API on the /parse URL prefix
 const mountPath = PARSE_MOUNT;
 app.use(mountPath, api);
 
+app.use(express.static('views'));
+app.use(expressLayouts);
+
+app.use((req, res, next) => {
+    res.locals.appId     = APP_ID;
+    res.locals.serverUrl = SERVER_URL;
+    next();
+});
+
+app.get('/', (req, res) => res.render('index'));
+
+
+// Parse Dashboard
+const DASHBOARD_URL      = process.env.DASHBOARD_URL;
+const DASHBOARD_USER     = process.env.DASHBOARD_USER;
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+if (DASHBOARD_USER) {
+    const dashboard = new ParseDashboard({
+        apps       : [
+            {
+                appName  : APP_NAME,
+                serverURL: SERVER_URL,
+                appId    : APP_ID,
+                masterKey: MASTER_KEY,
+                iconName : 'icon.png'
+            }
+        ],
+        users      : [
+            {
+                user: DASHBOARD_USER, // Used to log in to your Parse Dashboard
+                pass: DASHBOARD_PASSWORD
+            }
+        ],
+        iconsFolder: 'icons'
+    }, true);
+
+    // make the Parse Dashboard available at /dashboard
+    app.use(DASHBOARD_URL, dashboard);
+}
 
 const httpServer = require('http').createServer(app);
-httpServer.listen(PORT, () => console.log(APP_NAME + ' server running on ' + SERVER_HOST + '.'));
+httpServer.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
 
 // This will enable the Live Query real-time server
 ParseServer.createLiveQueryServer(httpServer);

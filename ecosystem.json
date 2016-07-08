@@ -5,55 +5,39 @@
    */
   "apps": [
     {
-      "name": "parse-dashboard",
-      "script": "dashboard.js",
-      "watch": true,
-      "merge_logs": true,
-      "env": {
-        "PORT": 2000,
-        // Parse Dashboard
-        "DASHBOARD_URL": "/",
-        "DASHBOARD_USER": "movibe",
-        "DASHBOARD_PASSWORD": "kemera@2010"
-      }
-    },
-    {
-      "name": "photogram-server",
+      "name": "parse-server",
       "script": "index.js",
       "watch": true,
       "merge_logs": true,
       "env": {
-        // Live Query
-        //        "LIVE_QUERY": [
-        //          "GalleryComment"
-        //        ],
-        //FOLDER
-        "FOLDER": "photogram",
+
         // Mount path for the server. Defaults to /parse.
-        "EJS_FOLDER": "views",
-        // PORT
-        "PORT": 1337,
-        // Mount path for the server. Defaults to /parse.
-        "PARSE_MOUNT": "/api",
+        "PARSE_MOUNT": "/parse",
+
         // (required) - The connection string for your database, i.e. mongodb://user:pass@host.com/dbname.
         // Be sure to URL encode your password if your password has special characters.
         "DATABASE_URI": "mongodb://localhost:27017/photogram",
+
         // URL to your Parse Server (don't forget to specify http:// or https://).
         // This URL will be used when making requests to Parse Server from Cloud Code.
-        "SERVER_URL": "https://photogramapp.com",
-        // HOST PARSE SERVER
-        "SERVER_HOST": "https://photogramapp.com/api",
+        "SERVER_URL": "https://photogramapp.com/parse",
+
         // Your apps name. This will appear in the subject and body of the emails that are sent.
         "APP_NAME": "Photogram",
+
         // (required) - The application id to host with this server instance.
         // You can use any arbitrary string. For migrated
-        "APP_ID": "com.agenciafoccus.photogram",
+        "APP_ID": "myAppId",
+
         // (required) - The master key to use for overriding ACL security.
         // You can use any arbitrary string. Keep it secret! For migrated apps, this should match your hosted Parse app.
         "MASTER_KEY": "myMasterKey",
         "MASTER_REST_KEY": "MPhotogramMasterKey",
-        // (optional) - Local for Storage Files
-        //"UPLOAD_LOCAL": true,
+
+        // Parse Dashboard
+        "DASHBOARD_URL": "/dashboard",
+        "DASHBOARD_USER": "movibe",
+        "DASHBOARD_PASSWORD": "kemera@02010",
 
         // (optional) - S3 for Storage Files
         // Files are hosted via automaticamentes GridStore Adapter in MongoDB
@@ -66,60 +50,7 @@
         "MAILGUN_API_KEY": "key-3a05e956706a4bd579982460b96cf43a",
         "MAILGUN_DOMAIN": "https://api.mailgun.net/v3/photogramapp.com",
         "MAILGUN_FROM_ADDRESS": "postmaster@photogramapp.com",
-        // (optional) - ONE SIGNAL for Send Push Notifications
-        "ONE_SIGNAL_APP_ID": "d13d00d0-013f-406f-9811-66ce0737d7bc",
-        "ONE_SIGNAL_REST_API_KEY": "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl"
-      }
-    },
-    {
-      "name": "capela-server",
-      "script": "index.js",
-      "watch": true,
-      "merge_logs": true,
-      "env": {
-        // Live Query
-        //        "LIVE_QUERY": [
-        //          "GalleryComment"
-        //        ],
-        //FOLDER
-        "FOLDER": "capela",
-        // Mount path for the server. Defaults to /parse.
-        "EJS_FOLDER": "views",
-        // PORT
-        "PORT": 1338,
-        // Mount path for the server. Defaults to /parse.
-        "PARSE_MOUNT": "/api",
-        // (required) - The connection string for your database, i.e. mongodb://user:pass@host.com/dbname.
-        // Be sure to URL encode your password if your password has special characters.
-        "DATABASE_URI": "mongodb://localhost:27017/capela",
-        // URL to your Parse Server (don't forget to specify http:// or https://).
-        // This URL will be used when making requests to Parse Server from Cloud Code.
-        "SERVER_URL": "https://photogramapp.com/capela",
-        // HOST PARSE SERVER
-        "SERVER_HOST": "https://photogramapp.com/capela/api",
-        // Your apps name. This will appear in the subject and body of the emails that are sent.
-        "APP_NAME": "Photogram",
-        // (required) - The application id to host with this server instance.
-        // You can use any arbitrary string. For migrated
-        "APP_ID": "com.agenciafoccus.capela",
-        // (required) - The master key to use for overriding ACL security.
-        // You can use any arbitrary string. Keep it secret! For migrated apps, this should match your hosted Parse app.
-        "MASTER_KEY": "myMasterKey",
-        "MASTER_REST_KEY": "MPhotogramMasterKey",
-        // (optional) - Local for Storage Files
-        //"UPLOAD_LOCAL": true,
 
-        // (optional) - S3 for Storage Files
-        // Files are hosted via automaticamentes GridStore Adapter in MongoDB
-        // If you want to host the files on S3 fill in the form below
-        //"AWS_ACCESS_KEY_ID": "",
-        //"AWS_SECRET_ACCESS_KEY": "",
-        //"BUCKET_NAME": "",
-
-        // (optional) - MAILGUN for send Email
-        "MAILGUN_API_KEY": "key-3a05e956706a4bd579982460b96cf43a",
-        "MAILGUN_DOMAIN": "https://api.mailgun.net/v3/photogramapp.com",
-        "MAILGUN_FROM_ADDRESS": "postmaster@photogramapp.com",
         // (optional) - ONE SIGNAL for Send Push Notifications
         "ONE_SIGNAL_APP_ID": "d13d00d0-013f-406f-9811-66ce0737d7bc",
         "ONE_SIGNAL_REST_API_KEY": "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl"
