@@ -9,7 +9,7 @@ const Dashboard       = require('./class/Dashboard');
 
 
 // Instalattion
-Parse.Cloud.beforeSave(Installation.beforeSave);
+//Parse.Cloud.beforeSave(Installation.beforeSave);
 
 // Install
 Parse.Cloud.define('status', Install.status);
