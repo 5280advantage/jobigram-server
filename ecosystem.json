@@ -46,14 +46,14 @@
         // Push Notification
         "PUSH": {
           "android": {
-            "apiKey": "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk",
-            "senderId": "285805785383"
-          },
-          "ios": {
-            "pfx": "./keys/ios_push_certificate.p12",
-            "bundleId": "com.agenciafoccus.photogram",
-            "production": false
+            "senderId": "285805785383",
+            "apiKey": "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
           }
+//          ,"ios": {
+//            "pfx": "./keys/ios_push_certificate.p12",
+//            "bundleId": "com.agenciafoccus.photogram",
+//            "production": false
+//          }
         }
       }
     }

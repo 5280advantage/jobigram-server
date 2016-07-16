@@ -42,18 +42,7 @@ let ServerConfig = {
 // Parse Push
 let PUSH = process.env.PUSH;
 if (PUSH) {
-    PUSH = JSON.parse(PUSH);
-    ServerConfig.push = {
-        android: {
-            senderId: PUSH.android.senderId,
-            apiKey  : PUSH.android.apiKey
-        },
-        ios    : {
-            pfx       : PUSH.ios.pfx,
-            bundleId  : PUSH.ios.bundleId,
-            production: PUSH.ios.production
-        }
-    };
+    ServerConfig.push = JSON.parse(PUSH);
 }
 
 // File Local
@@ -93,6 +82,7 @@ if (MAILGUN_API_KEY) {
     };
 }
 
+console.log(ServerConfig);
 
 // Start Parse Server
 const api = new ParseServer(ServerConfig);
