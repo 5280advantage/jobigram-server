@@ -39,11 +39,22 @@ let ServerConfig = {
     //},
 };
 
+var OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
+var oneSignalPushAdapter = new OneSignalPushAdapter({
+    oneSignalAppId : "d13d00d0-013f-406f-9811-66ce0737d7bc",
+    oneSignalApiKey: "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl"
+});
+
+
 // Parse Push
-let PUSH = process.env.PUSH;
-if (PUSH) {
-    ServerConfig.push = JSON.parse(PUSH);
-}
+//let PUSH = process.env.PUSH;
+//if (PUSH) {
+//    ServerConfig.push = JSON.parse(PUSH);
+//}
+
+ServerConfig.push = {
+    adapter: oneSignalPushAdapter
+};
 
 // File Local
 const UPLOAD_LOCAL_PATH = process.env.UPLOAD_LOCAL_PATH;
