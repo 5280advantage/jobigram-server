@@ -40,8 +40,9 @@ let ServerConfig = {
 };
 
 // Parse Push
-const PUSH       = process.env.push;
+let PUSH = process.env.PUSH;
 if (PUSH) {
+    PUSH = JSON.parse(PUSH);
     ServerConfig.push = {
         android: {
             senderId: PUSH.android.senderId,
