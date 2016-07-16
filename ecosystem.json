@@ -49,8 +49,8 @@
             "senderId": "285805785383"
           },
           "ios": {
-            "pfx": "my-push-certificate.p12",
-            "bundleId": "com.company.myapp",
+            "pfx": "./keys/ios_push_certificate.p12",
+            "bundleId": "com.agenciafoccus.photogram",
             "production": false
           }
         }
