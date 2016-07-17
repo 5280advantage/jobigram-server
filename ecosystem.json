@@ -14,7 +14,7 @@
         "PARSE_MOUNT": "/parse",
         // (required) - The connection string for your database, i.e. mongodb://user:pass@host.com/dbname.
         // Be sure to URL encode your password if your password has special characters.
-        "DATABASE_URI": "mongodb://movibe:Kemera@3095@localhost:27017/photogram?ssl=true",
+        "DATABASE_URI": "mongodb://parse:Kemera@3095@localhost:27017/photogram?ssl=true",
         // URL to your Parse Server (don't forget to specify http:// or https://).
         // This URL will be used when making requests to Parse Server from Cloud Code.
         "SERVER_URL": "https://photogramapp.com/parse",
