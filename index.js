@@ -38,9 +38,9 @@ let ServerConfig = {
     allowClientClassCreation: false,
     verbose                 : true,
     maxUploadSize           : '10mb',
-    liveQuery               : {
-        classNames: ['GalleryActivity']
-    },
+    //liveQuery               : {
+    //    classNames: ['GalleryActivity']
+    //},
 };
 //
 //var OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
