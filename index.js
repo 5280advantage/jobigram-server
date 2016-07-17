@@ -36,29 +36,30 @@ let ServerConfig = {
     verifyUserEmails        : false,
     enableAnonymousUsers    : true,
     allowClientClassCreation: false,
-    verbose                 : true,
     maxUploadSize           : '10mb',
-    //liveQuery               : {
-    //    classNames: ['GalleryActivity']
-    //},
+    liveQuery               : {
+        classNames: ['GalleryActivity']
+    },
 };
-//
-//var OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
-//var oneSignalPushAdapter = new OneSignalPushAdapter({
-//    oneSignalAppId : "d13d00d0-013f-406f-9811-66ce0737d7bc",
-//    oneSignalApiKey: "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl"
-//});
-//ServerConfig.push = {
-//    adapter: oneSignalPushAdapter
-//};
 
 
-//Parse Push
+// Parse Push
 let PUSH = process.env.PUSH;
 if (PUSH) {
     ServerConfig.push = JSON.parse(PUSH);
 }
 
+/*
+ var OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
+ var oneSignalPushAdapter = new OneSignalPushAdapter({
+ oneSignalAppId : "d13d00d0-013f-406f-9811-66ce0737d7bc",
+ oneSignalApiKey: "ZjQxOTEyMDQtN2QwOC00Nzg3LTgxZjctYmEwNjdhN2QwYWVl"
+ });
+
+ ServerConfig.push = {
+ adapter: oneSignalPushAdapter
+ };
+ */
 
 // File Local
 const UPLOAD_LOCAL_PATH = process.env.UPLOAD_LOCAL_PATH;
