@@ -25,18 +25,22 @@ if (!DATABASE_URI) {
 }
 
 let ServerConfig = {
-    databaseURI     : DATABASE_URI,
-    cloud           : CLOUD_CODE_MAIN,
-    appId           : APP_ID,
-    masterKey       : MASTER_KEY,
-    serverURL       : SERVER_URL,
-    restAPIKey      : MASTER_REST_KEY,
-    verifyUserEmails: false,
-    publicServerURL : SERVER_URL,
-    appName         : APP_NAME,
-    //liveQuery       : {
-    //    classNames: ['GalleryComment']
-    //},
+    databaseURI             : DATABASE_URI,
+    cloud                   : CLOUD_CODE_MAIN,
+    appId                   : APP_ID,
+    masterKey               : MASTER_KEY,
+    serverURL               : SERVER_URL,
+    restAPIKey              : MASTER_REST_KEY,
+    publicServerURL         : SERVER_URL,
+    appName                 : APP_NAME,
+    verifyUserEmails        : false,
+    enableAnonymousUsers    : true,
+    allowClientClassCreation: false,
+    verbose                 : true,
+    maxUploadSize           : '10mb',
+    liveQuery       : {
+        classNames: ['GalleryActivity']
+    },
 };
 
 var OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
