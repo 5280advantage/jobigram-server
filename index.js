@@ -44,7 +44,7 @@ let ServerConfig = {
     liveQuery               : {
         classNames: ['GalleryActivity']
     },
-    push                    : {
+    push: {
         android: {
             senderId: PUSH_ANDROID_SENDER,
             apiKey  : PUSH_ANDROID_API_KEY

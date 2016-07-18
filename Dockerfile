@@ -14,7 +14,7 @@ ENV MASTER_KEY MPhotogramMasterKey
 
 #ENV DATABASE_URI setMongoDBURI
 
-ENV SERVER_URL 'http://photogram.codevibe.io:1337/api'
+ENV SERVER_URL 'http://photogram.codevibe.io:1337/parse'
 ENV DASHBOARD_URL '/dashboard'
 ENV DASHBOARD_USER 'admin'
 ENV DASHBOARD_PASSWORD 'admin123'
