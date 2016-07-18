@@ -24,9 +24,9 @@ ENV PUSH_ANDROID_SENDER 285805785383
 ENV PUSH_ANDROID_API_KEY 'AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk'
 
 # MAILGUN
-MAILGUN_API_KEY 'key-3a05e956706a4bd579982460b96cf43a'
-MAILGUN_DOMAIN 'https://api.mailgun.net/v3/photogramapp.com'
-MAILGUN_FROM_ADDRESS 'postmaster@photogramapp.com'
+ENV MAILGUN_API_KEY 'key-3a05e956706a4bd579982460b96cf43a'
+ENV MAILGUN_DOMAIN 'https://api.mailgun.net/v3/photogramapp.com'
+ENV MAILGUN_FROM_ADDRESS 'postmaster@photogramapp.com'
 
 #ENV UPLOAD_LOCAL_PATH MPhotogramMasterKey
 
