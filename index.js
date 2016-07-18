@@ -19,6 +19,10 @@ const APP_NAME        = process.env.APP_NAME || 'parseApp';
 const PARSE_MOUNT     = process.env.PARSE_MOUNT || '/parse';
 const CLOUD_CODE_MAIN = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js';
 
+// Parse Push Android
+let PUSH_ANDROID_SENDER  = process.env.PUSH_ANDROID_SENDER;
+let PUSH_ANDROID_API_KEY = process.env.PUSH_ANDROID_API_KEY;
+
 // Database Ecosystem file
 if (!DATABASE_URI) {
     console.log('DATABASE_URI not specified, falling back to localhost.');
@@ -40,21 +44,14 @@ let ServerConfig = {
     liveQuery               : {
         classNames: ['GalleryActivity']
     },
-};
-
-
-ServerConfig.push        = {}
-// Parse Push Android
-let PUSH_ANDROID_SENDER  = process.env.PUSH_ANDROID_SENDER;
-let PUSH_ANDROID_API_KEY = process.env.PUSH_ANDROID_API_KEY;
-if (PUSH_ANDROID_API_KEY) {
-    ServerConfig.push.android = {
+    push                    : {
         android: {
             senderId: PUSH_ANDROID_SENDER,
             apiKey  : PUSH_ANDROID_API_KEY
         }
-    };
-}
+    }
+};
+
 
 /*
  var OneSignalPushAdapter = require('parse-server-onesignal-push-adapter');
