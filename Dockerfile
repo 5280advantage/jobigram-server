@@ -12,7 +12,7 @@ ENV MASTER_KEY MasterKey
 ENV MASTER_KEY myMasterKey
 ENV MASTER_KEY MPhotogramMasterKey
 
-ENV PORT 5000
+ENV PORT 1337
 
 #ENV DATABASE_URI setMongoDBURI
 
@@ -38,7 +38,7 @@ ENV MAILGUN_FROM_ADDRESS 'postmaster@photogramapp.com'
 # Optional (default : '/parse')
 ENV PARSE_MOUNT '/parse'
 
-EXPOSE 5000
+EXPOSE 5001
 
 # Uncomment if you want to access cloud code outside of your container
 # A main.js file must be present, if not Parse will not start
