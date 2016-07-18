@@ -10,12 +10,12 @@ const S3Adapter      = require('parse-server').S3Adapter;
 
 // Parse configuration
 const PORT            = process.env.PORT || 1337;
-const DATABASE_URI    = process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://localhost:27017/dev';
+const DATABASE_URI    = process.env.MONGO_URL || process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://localhost:27017/dev';
 const SERVER_URL      = process.env.SERVER_URL || 'http://localhost:1337/parse';
 const APP_ID          = process.env.APP_ID || 'myAppId';
 const MASTER_KEY      = process.env.MASTER_KEY || 'myMasterKey';
 const MASTER_REST_KEY = process.env.MASTER_REST_KEY || 'myRestApiKey';
-const APP_NAME        = process.env.APP_NAME || 'photogram';
+const APP_NAME        = process.env.APP_NAME || 'parseApp';
 const PARSE_MOUNT     = process.env.PARSE_MOUNT || '/parse';
 const CLOUD_CODE_MAIN = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js';
 
@@ -43,10 +43,17 @@ let ServerConfig = {
 };
 
 
-// Parse Push
-let PUSH = process.env.PUSH;
-if (PUSH) {
-    ServerConfig.push = JSON.parse(PUSH);
+ServerConfig.push        = {}
+// Parse Push Android
+let PUSH_ANDROID_SENDER  = process.env.PUSH_ANDROID_SENDER;
+let PUSH_ANDROID_API_KEY = process.env.PUSH_ANDROID_API_KEY;
+if (PUSH_ANDROID_API_KEY) {
+    ServerConfig.push.android = {
+        android: {
+            senderId: PUSH_ANDROID_SENDER,
+            apiKey  : PUSH_ANDROID_API_KEY
+        }
+    };
 }
 
 /*
