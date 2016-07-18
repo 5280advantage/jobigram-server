@@ -16,7 +16,7 @@ ENV PORT 1337
 
 #ENV DATABASE_URI setMongoDBURI
 
-ENV SERVER_URL 'http://photogram.codevibe.io/parse'
+ENV SERVER_URL 'http://photogram.codevibe.io:1337/parse'
 ENV DASHBOARD_URL '/dashboard'
 ENV DASHBOARD_USER 'admin'
 ENV DASHBOARD_PASSWORD 'admin123'
@@ -38,7 +38,7 @@ ENV MAILGUN_FROM_ADDRESS 'postmaster@photogramapp.com'
 # Optional (default : '/parse')
 ENV PARSE_MOUNT '/parse'
 
-EXPOSE 5001
+EXPOSE 1337
 
 # Uncomment if you want to access cloud code outside of your container
 # A main.js file must be present, if not Parse will not start
