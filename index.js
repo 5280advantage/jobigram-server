@@ -43,11 +43,23 @@ let ServerConfig = {
     liveQuery               : {
         classNames: ['GalleryActivity']
     },
-    push: {
+    push                    : {
         android: {
-            senderId: PUSH_ANDROID_SENDER,
-            apiKey  : PUSH_ANDROID_API_KEY
-        }
+            senderId: '285805785383',
+            apiKey  : 'AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk'
+        },
+        ios    : [
+            {
+                pfx       : '../keys/ios_push_certificate.p12', // Dev PFX or P12
+                bundleId  : 'com.agenciafoccus.photogram',
+                production: false // Dev
+            },
+            {
+                pfx       : '../keys/ios_push_certificate.p12', // Prod PFX or P12
+                bundleId  : 'com.agenciafoccus.photogram',
+                production: true // Prod
+            }
+        ]
     }
 };
 
