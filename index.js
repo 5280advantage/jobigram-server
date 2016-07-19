@@ -39,7 +39,7 @@ let ServerConfig = {
     appName                 : APP_NAME,
     verifyUserEmails        : false,
     enableAnonymousUsers    : true,
-    allowClientClassCreation: false,
+    allowClientClassCreation: true,
     maxUploadSize           : '10mb',
     liveQuery               : {
         classNames: ['GalleryActivity']
