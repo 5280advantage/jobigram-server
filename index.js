@@ -8,7 +8,7 @@ const FSFilesAdapter = require('parse-server-fs-adapter');
 const S3Adapter      = require('parse-server').S3Adapter;
 
 // Parse configuration
-const PORT            = process.env.PORT || 5000;
+const PORT            = process.env.PORT || 5000; 
 const DATABASE_URI    = process.env.MONGO_URL || process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://localhost:27017/dev';
 const SERVER_URL      = process.env.SERVER_URL || 'http://localhost:1337/parse';
 const APP_ID          = process.env.APP_ID || 'myAppId';
