@@ -38,6 +38,7 @@ ENV MAILGUN_FROM_ADDRESS 'postmaster@photogramapp.com'
 ENV PARSE_MOUNT '/parse'
 
 EXPOSE 1337
+EXPOSE 443
 
 # Uncomment if you want to access cloud code outside of your container
 # A main.js file must be present, if not Parse will not start
