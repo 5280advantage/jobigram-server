@@ -17,6 +17,8 @@ ENV MASTER_KEY MPhotogramMasterKey
 
 ENV PORT 1338 
 
+ENV SERVER_URL 'https://photogram.codevibe.io/parse'
+
 #ENV DATABASE_URI setMongoDBURI
 
 
