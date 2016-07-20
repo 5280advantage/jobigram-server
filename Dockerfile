@@ -6,6 +6,9 @@ ADD . /parse
 WORKDIR /parse
 RUN npm install
 
+RUN npm install -g pm2
+RUN pm2 link 26q77p5s4yxfhat 9gszvtd1cartqan photogram
+
 ENV APP_NAME Photogram
 ENV APP_ID myAppId
 ENV MASTER_KEY MasterKey
