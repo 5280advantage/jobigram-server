@@ -285,7 +285,7 @@ function feed(req, res, next) {
                     }).then(user => {
 
                         let obj = {
-                            id           : itemGallery.id,
+                            objectId     : itemGallery.id,
                             galleryObj   : itemGallery,
                             comments     : [],
                             createdAt    : itemGallery.get('createdAt'),
@@ -406,7 +406,7 @@ function search(req, res, next) {
                 }).then(user => {
 
                     let obj = {
-                        id           : itemGallery.id,
+                        objectId     : itemGallery.id,
                         galleryObj   : itemGallery,
                         comments     : [],
                         createdAt    : itemGallery.get('createdAt'),
