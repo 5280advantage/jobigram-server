@@ -87,8 +87,8 @@ function list(req, res, next) {
 
     if (params.username) {
         new Parse.Query('User')
-            .equalTo('username', params.user)
-            .first()
+            .equalTo('username', params.username)
+            .first({useMasterKey: true})
             .then(user=> {
                 runQuery(user)
             });
@@ -102,7 +102,7 @@ function list(req, res, next) {
             .limit(_limit)
             .skip((_page * _limit) - _limit)
             .equalTo('user', user)
-            .find()
+            .find({useMasterKey: true})
             .then(data=> res.success(data), error=> res.error(error.message))
     }
 
