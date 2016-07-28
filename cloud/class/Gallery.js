@@ -4,6 +4,7 @@ const Image           = require('./../helpers/image');
 const User            = require('./../class/User');
 const GalleryActivity = require('./../class/GalleryActivity');
 const ParseObject     = Parse.Object.extend('Gallery');
+const GalleryAlbum    = Parse.Object.extend('GalleryAlbum');
 const UserFollow      = Parse.Object.extend('UserFollow');
 
 module.exports = {
@@ -11,6 +12,8 @@ module.exports = {
     afterSave     : afterSave,
     afterDelete   : afterDelete,
     feed          : feed,
+    search        : search,
+    getAlbum      : getAlbum,
     commentGallery: commentGallery,
     isGalleryLiked: isGalleryLiked,
     likeGallery   : likeGallery,
@@ -49,9 +52,9 @@ function beforeSave(req, res) {
         return res.error('Upload the first image');
     }
 
-    if (!gallery.get('title')) {
-        return res.error('Need image title');
-    }
+    //if (!gallery.get('title')) {
+    //    return res.error('Need image title');
+    //}
 
     if (!gallery.dirty('image')) {
         return res.success();
@@ -217,6 +220,147 @@ function commentGallery(req, res) {
 }
 
 
+function search(req, res, next) {
+    const params = req.params;
+    const _page  = req.params.page || 1;
+    const _limit = req.params.limit || 24;
+
+    let _query = new Parse.Query(ParseObject);
+
+    let text = req.params.search;
+
+    if (text) {
+        let toLowerCase = w => w.toLowerCase();
+        var words       = text.split(/\b/);
+        words           = _.map(words, toLowerCase);
+
+        var stopWords = ['the', 'in', 'and']
+        words         = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
+
+        var hashtags = text.match(/#.+?\b/g);
+        hashtags     = _.map(hashtags, toLowerCase);
+
+        if (words) {
+            _query.containsAll('words', [words]);
+        }
+
+        if (hashtags) {
+            _query.containsAll('hashtags', [hashtags]);
+        }
+
+    }
+
+    _query
+        .equalTo('isApproved', true)
+        .descending('createdAt')
+        .limit(_limit)
+        .skip((_page * _limit) - _limit)
+        .find({useMasterKey: true})
+        .then(data => {
+            let _result = [];
+
+            if (!data.length) {
+                res.success(_result);
+            }
+
+            let cb = _.after(data.length, () => {
+                res.success(_result);
+            });
+
+            _.each(data, itemGallery => {
+
+                // User Data
+                let userGet = itemGallery.get('user');
+                new Parse.Query('UserData').equalTo('user', userGet).first({
+                    useMasterKey: true
+                }).then(user => {
+
+                    let obj = {
+                        id           : itemGallery.id,
+                        galleryObj   : itemGallery,
+                        comments     : [],
+                        createdAt    : itemGallery.get('createdAt'),
+                        image        : itemGallery.get('image'),
+                        imageThumb   : itemGallery.get('imageThumb'),
+                        title        : itemGallery.get('title'),
+                        commentsTotal: itemGallery.get('commentsTotal') || 0,
+                        likesTotal   : itemGallery.get('likesTotal') || 0,
+                        isApproved   : itemGallery.get('isApproved'),
+                        user         : {
+                            obj     : itemGallery.get('user'),
+                            name    : user.get('name'),
+                            username: user.get('username'),
+                            status  : user.get('status'),
+                            photo   : user.get('photo')
+                        }
+                    };
+                    //console.log('Obj', obj);
+
+                    // Is Liked
+                    new Parse.Query('Gallery')
+                        .equalTo('likes', req.user)
+                        .equalTo('objectId', itemGallery.id)
+                        .first({
+                            useMasterKey: true
+                        })
+                        .then(liked => {
+                            obj.isLiked = liked ? true : false;
+
+                            // Comments
+                            new Parse.Query('GalleryComment')
+                                .equalTo('gallery', itemGallery)
+                                .limit(3)
+                                .find({
+                                    useMasterKey: true
+                                })
+                                .then(comments => {
+                                    comments.map(function (comment) {
+                                        obj.comments.push({
+                                            id  : comment.id,
+                                            obj : comment,
+                                            user: {
+                                                obj     : itemGallery.get('user'),
+                                                name    : user.get('name'),
+                                                username: user.get('username'),
+                                                status  : user.get('status'),
+                                                photo   : user.get('photo')
+                                            },
+                                            text: comment.get('text'),
+                                        })
+                                    });
+                                    //console.log('itemGallery', itemGallery, user, comments);
+                                    // Comments
+                                    _result.push(obj);
+                                    cb();
+
+                                }, error => res.error(error.message));
+                        }, error => res.error(error.message));
+                }, err => console.log);
+            });
+        }, error => res.error(error.message))
+
+}
+
+function getAlbum(req, res) {
+    const params = req.params;
+    new Parse.Query(GalleryAlbum)
+        .get(params.id)
+        .then(album=> {
+
+            new Parse.Query(ParseObject)
+                .equalTo('album', album)
+                .find({useMasterKey: true})
+                .then(photos=> {
+                    let result = {
+                        album : album,
+                        photos: photos
+                    };
+                    res.success(result);
+                }, res.error)
+
+        }, res.error);
+}
+
 function feed(req, res, next) {
     const params = req.params;
     const _page  = req.params.page || 1;
@@ -230,6 +374,10 @@ function feed(req, res, next) {
 
     if (params.hashtags) {
         _query.containsAll("hashtags", [params.hashtags]);
+    }
+
+    if (params.id) {
+        _query.equalTo('objectId', params.id);
     }
 
     let following = [];
@@ -272,7 +420,7 @@ function feed(req, res, next) {
             .skip((_page * _limit) - _limit)
             .containedIn('user', following)
             .include('album')
-            .find()
+            .find({useMasterKey: true})
             .then(data=> {
                 let _result = [];
 

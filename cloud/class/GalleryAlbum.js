@@ -85,18 +85,13 @@ function list(req, res, next) {
 
     let _query = new Parse.Query(ParseObject);
 
-    if (params.filter) {
-        _query.contains('words', params.filter);
-    }
-
-    if (params.hashtags) {
-        _query.containsAll("hashtags", [params.hashtags]);
-    }
-
-    if (params.user) {
-        new Parse.Query('User').get(params.user).then(user=> {
-            runQuery(user)
-        });
+    if (params.username) {
+        new Parse.Query('User')
+            .equalTo('username', params.user)
+            .first()
+            .then(user=> {
+                runQuery(user)
+            });
     } else {
         runQuery(req.user);
     }
