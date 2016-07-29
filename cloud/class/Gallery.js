@@ -440,12 +440,13 @@ function feed(req, res, next) {
 
                         let obj = {
                             id           : itemGallery.id,
-                            galleryObj   : itemGallery,
+                            obj          : itemGallery,
                             comments     : [],
                             album        : itemGallery.get('album'),
                             createdAt    : itemGallery.get('createdAt'),
                             image        : itemGallery.get('image'),
                             imageThumb   : itemGallery.get('imageThumb'),
+                            location     : itemGallery.get('location'),
                             title        : itemGallery.get('title'),
                             commentsTotal: itemGallery.get('commentsTotal') || 0,
                             likesTotal   : itemGallery.get('likesTotal') || 0,
