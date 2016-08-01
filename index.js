@@ -127,7 +127,7 @@ httpServer.listen(PORT, () => console.log('parse-server-example running on port 
 
 // This will enable the Live Query real-time server
 ParseServer.createLiveQueryServer(httpServer);
-
+ 
 
 // Socket.io Server
 /*
