@@ -84,6 +84,7 @@ function alertMessage(req) {
             } else {
                 message = req.user.get('name') + ' commented on your photo.';
             }
+            return message;
             break;
         case 'like':
             if (req.user.get('name')) {
@@ -91,6 +92,7 @@ function alertMessage(req) {
             } else {
                 message = 'Someone likes your photo.';
             }
+            return message;
             break;
 
         case 'followUser':
@@ -99,6 +101,7 @@ function alertMessage(req) {
             } else {
                 message = 'You have a new follower.';
             }
+            return message;
             break;
     }
 
