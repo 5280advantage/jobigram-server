@@ -43,24 +43,17 @@ let ServerConfig = {
     liveQuery               : {
         classNames: ['GalleryActivity']
     },
-    push                    : {
-        android: {
-            senderId: '285805785383',
-            apiKey  : 'AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk'
-        },
-        ios    : [
-            {
-                pfx       : '../keys/ios_push_certificate.p12', // Dev PFX or P12
-                bundleId  : 'com.agenciafoccus.photogram',
-                production: false // Dev
-            },
-            {
-                pfx       : '../keys/ios_push_certificate.p12', // Prod PFX or P12
-                bundleId  : 'com.agenciafoccus.photogram',
-                production: true // Prod
-            }
-        ]
-    }
+    push: {
+      ios:{
+         pfx: "$RELATIVE_PATH_TO_YOUR_p12_FILE",
+         bundleId: "$RELATIVE_PATH_TO_YOUR_p12_FILE",
+         production: false
+      },
+      android:{
+         senderId: "285805785383",
+         apiKey: "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
+      }
+   }
 };
 
 
@@ -129,14 +122,15 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => res.render('index'));
 
-//const httpServer = require('http').createServer(app);
-//httpServer.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
-//
-//// This will enable the Live Query real-time server
-//ParseServer.createLiveQueryServer(httpServer);
+const httpServer = require('http').createServer(app);
+httpServer.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
+
+// This will enable the Live Query real-time server
+ParseServer.createLiveQueryServer(httpServer);
 
 
 // Socket.io Server
+/*
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
@@ -145,7 +139,7 @@ io.on('connection', function(socket){
 });
 
 http.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
-
 // This will enable the Live Query real-time server
 ParseServer.createLiveQueryServer(http);
+/*
 
