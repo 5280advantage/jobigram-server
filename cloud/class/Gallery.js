@@ -542,7 +542,8 @@ function likeGallery(req, res, next) {
         activity = {
             fromUser: user,
             gallery : objParse,
-            action  : response.action
+            action  : response.action,
+            toUser  : objParse.user
         };
 
         console.log('step4', activity);

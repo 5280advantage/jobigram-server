@@ -29,11 +29,14 @@ function afterSave(req, res) {
         {
             channels: [toUser.username],
             data   : data
-        },
-        {
-            success: res.success,
-            error  : res.error
-        });
+        },{ useMasterKey: true })
+         .then(function() {
+             console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
+             res.success({status: 'push sent', ts: Date.now()});
+         }, function(error) {
+             console.log('push failed. ' + JSON.stringify(error) + '\n');
+             res.error(error);
+         });
 
 
 }
