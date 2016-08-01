@@ -11,9 +11,9 @@ module.exports = {
 };
 
 function afterSave(req, res) {
-    if (req.object.existed()) {
-        return
-    }
+    //if (req.object.existed()) {
+    //    return
+    //}
 
     // Send Notification toUser
     const toUser = req.object.get('toUser');
