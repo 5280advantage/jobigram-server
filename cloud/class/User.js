@@ -817,7 +817,7 @@ function saveFacebookPicture(req, res, next) {
         return res.error('Not Authorized');
     }
 
-    if (user.attributes.photo.length) {
+    if (user.photo.length) {
         return res.success('Photo user')
     }
 
