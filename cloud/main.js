@@ -7,10 +7,13 @@ const GalleryActivity = require('./class/GalleryActivity');
 const GalleryComment  = require('./class/GalleryComment');
 const Installation    = require('./class/Installation');
 const Dashboard       = require('./class/Dashboard');
+const Push            = require('./class/Push');
 
-
-// Instalattion
-Parse.Cloud.beforeSave(Installation.beforeSave);
+// Push
+Parse.Cloud.beforeSave('Installation', Installation.beforeSave);
+Parse.Cloud.define('verifyServerConnection', Push.verifyServerConnection);
+Parse.Cloud.define('pushText', Push.pushText);
+Parse.Cloud.define('pushChat', Push.pushChat);
 
 // Install
 Parse.Cloud.define('status', Install.status);
@@ -20,6 +23,7 @@ Parse.Cloud.define('install', Install.start);
 Parse.Cloud.define('dashboard', Dashboard.home)
 
 // GalleryActivity
+Parse.Cloud.beforeSave('GalleryActivity', GalleryActivity.afterSave);
 Parse.Cloud.define('feedActivity', GalleryActivity.feed);
 
 // User
@@ -64,50 +68,5 @@ Parse.Cloud.define('isGalleryLiked', Gallery.isGalleryLiked);
 Parse.Cloud.beforeSave('GalleryComment', GalleryComment.beforeSave);
 Parse.Cloud.afterSave('GalleryComment', GalleryComment.afterSave);
 
-// Push
-// 
-Parse.Cloud.define('verifyServerConnection', function(req, res){
-   console.log('Parse.Cloud: verifyServerConnection. installationId ---' + req.installationId.slice(-5));
-   res.success({status: "a okay", ts: Date.now()});
-});
-
-function _sendPushToAll(data, res, delayMs){
-   console.log('Parse.Push data: ' + JSON.stringify(data));
-
-   //
-   // timeout is useful for testing coldstart pn with only 1 device
-   //
-   setTimeout(function(){
-      var query = new Parse.Query(Parse.Installation);
-      Parse.Push.send({
-        where: query,
-        data: data,
-      }, { useMasterKey: true })
-      .then(function() {
-         console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
-         res.success({status: 'push sent', ts: Date.now()});
-      }, function(error) {
-         console.log('push failed. ' + JSON.stringify(error) + '\n');
-         res.error(error);
-      });
-   }, delayMs);
-}
-
-Parse.Cloud.define('pushText', function(req, res) {
-   var data = {
-      alert: req.params.textMsg || "Hello from your Parse Server"
-   };
-   _sendPushToAll(data, res, req.params.delayMs || 0);
-});
-
-Parse.Cloud.define('pushChat', function(req, res){
-   //setting the 'event' key will trigger receivePN:chat on the client
-   var data = {
-      alert: req.params.textMsg || "Chat msg from your Parse Server",
-      event: 'chat'
-   };
-
-   _sendPushToAll(data, res, req.params.delayMs || 0);
-})
 
 
