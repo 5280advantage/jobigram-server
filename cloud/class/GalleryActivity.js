@@ -22,10 +22,13 @@ function afterSave(req, res) {
         return;
     }
 
+    let data = alertPayload(req);
+    console.log('Push', toUser.username, data);
+
     Parse.Push.send(
         {
-            channel: [toUser.username],
-            data   : alertPayload(req)
+            channels: [toUser.username],
+            data   : data
         },
         {
             success: res.success,
