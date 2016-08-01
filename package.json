@@ -18,7 +18,7 @@
     "express-ejs-layouts": "^2.2.0",
     "jimp": "^0.2.24",
     "kerberos": "~0.0.x",
-    "lodash": "^4.14.0",
+    "lodash": "^4.14.1",
     "method-override": "^2.3.6",
     "parse": "~1.9.0",
     "parse-dashboard": "^1.0.15",
