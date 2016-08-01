@@ -2,6 +2,7 @@
 const _           = require('lodash');
 const User        = require('./../class/User');
 const ParseObject = Parse.Object.extend('GalleryActivity');
+const User        = Parse.Object.extend('user');
 const UserFollow  = Parse.Object.extend('UserFollow');
 
 module.exports = {
@@ -22,16 +23,16 @@ function afterSave(req, res) {
         return;
     }
 
-    const query = new Parse.Query(Parse.Installation).equalTo('user', toUser);
     Parse.Push.send(
         {
-            where: query,
-            data : alertPayload(req)
+            channel: [toUser.username],
+            data   : alertPayload(req)
         },
         {
             success: res.success,
             error  : res.error
         });
+
 
 }
 

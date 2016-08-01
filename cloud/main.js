@@ -5,12 +5,10 @@ const Gallery         = require('./class/Gallery');
 const GalleryAlbum    = require('./class/GalleryAlbum');
 const GalleryActivity = require('./class/GalleryActivity');
 const GalleryComment  = require('./class/GalleryComment');
-const Installation    = require('./class/Installation');
 const Dashboard       = require('./class/Dashboard');
 const Push            = require('./class/Push');
 
 // Push
-Parse.Cloud.beforeSave('Installation', Installation.beforeSave);
 Parse.Cloud.define('verifyServerConnection', Push.verifyServerConnection);
 Parse.Cloud.define('pushText', Push.pushText);
 Parse.Cloud.define('pushChat', Push.pushChat);
