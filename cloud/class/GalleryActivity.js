@@ -2,7 +2,6 @@
 const _           = require('lodash');
 const User        = require('./../class/User');
 const ParseObject = Parse.Object.extend('GalleryActivity');
-const User        = Parse.Object.extend('user');
 const UserFollow  = Parse.Object.extend('UserFollow');
 
 module.exports = {
