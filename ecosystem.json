@@ -49,15 +49,15 @@
         // Push Notification
         "PUSH" :{
           "android": {
-            "apiKey": "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk",
-            "senderId": "285805785383"
+            "apiKey": "yourapiKey",
+            "senderId": "yoursenderId"
           },
           "ios":{
             "pfx": "my-push-certificate.p12",
             "bundleId": "com.company.myapp",
             "production": false
           }
-        },
+        }
 
       }
     }

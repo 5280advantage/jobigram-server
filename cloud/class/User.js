@@ -8,33 +8,35 @@ const Gallery         = Parse.Object.extend('Gallery');
 const _               = require('lodash');
 
 module.exports = {
-    beforeSave         : beforeSave,
-    afterSave          : afterSave,
-    afterDelete        : afterDelete,
-    profile            : profile,
-    avatar             : avatar,
-    get                : get,
-    createUser         : createUser,
-    findUserByEmail    : findUserByEmail,
-    findUserByUsername : findUserByUsername,
-    getUsers           : getUsers,
-    listUsers          : listUsers,
-    updateUser         : updateUser,
-    destroyUser        : destroyUser,
-    saveFacebookPicture: saveFacebookPicture,
-    follow             : follow,
-    isFollow           : isFollow,
-    getLikers          : getLikers,
-    getFollowers       : getFollowers,
-    getFollowing       : getFollowing,
-    validateUsername   : validateUsername,
-    validateEmail      : validateEmail,
-    incrementGallery   : incrementGallery,
-    decrementGallery   : decrementGallery,
-    incrementFollowers : incrementFollowers,
-    incrementFollowing : incrementFollowing,
-    incrementComment   : incrementComment,
-    decrementComment   : decrementComment,
+    beforeSave           : beforeSave,
+    afterSave            : afterSave,
+    afterDelete          : afterDelete,
+    profile              : profile,
+    avatar               : avatar,
+    get                  : get,
+    createUser           : createUser,
+    findUserByEmail      : findUserByEmail,
+    findUserByUsername   : findUserByUsername,
+    getUsers             : getUsers,
+    listUsers            : listUsers,
+    updateUser           : updateUser,
+    destroyUser          : destroyUser,
+    saveFacebookPicture  : saveFacebookPicture,
+    follow               : follow,
+    isFollow             : isFollow,
+    getLikers            : getLikers,
+    getFollowers         : getFollowers,
+    getFollowing         : getFollowing,
+    validateUsername     : validateUsername,
+    validateEmail        : validateEmail,
+    incrementGallery     : incrementGallery,
+    decrementGallery     : decrementGallery,
+    incrementFollowers   : incrementFollowers,
+    incrementFollowing   : incrementFollowing,
+    incrementComment     : incrementComment,
+    decrementComment     : decrementComment,
+    incrementAlbumGallery: incrementAlbumGallery,
+    decrementAlbumGallery: decrementAlbumGallery,
 };
 
 
@@ -529,9 +531,12 @@ function afterSave(req, res) {
             userData.set('status', user.get('status'));
             userData.set('username', user.get('username'));
             userData.set('photo', user.get('photo'));
-            userData.set('galleriesTotal', 0);
-            userData.set('followersTotal', 0);
-            userData.set('followingsTotal', 0);
+
+            // Define type increment
+            userData.increment('galleriesTotal', 0);
+            userData.increment('followersTotal', 0);
+            userData.increment('followingsTotal', 0);
+            userData.increment('albumTotal', 0);
         } else {
 
             const roleACL = new Parse.ACL();
@@ -806,42 +811,37 @@ function destroyUser(req, res, next) {
 }
 
 function saveFacebookPicture(req, res, next) {
-    const user = req.user;
+    var user = req.user;
 
     if (!user) {
-        res.error('Not Authorized');
-        return;
+        return res.error('Not Authorized');
     }
 
-    user.fetch({sessionToken: user.getSessionToken()}).then(objUser=> {
+    if (user.attributes.photo.length) {
+        return res.success('Photo user')
+    }
 
-        const authData = objUser.get('authData');
+    let facebook = user.attributes.facebook;
 
-        if (!authData) {
-            res.error('No auth data found');
-            return;
-        }
 
-        var url = 'https://graph.facebook.com/' + authData.facebook.id + '/picture';
-        return Parse.Cloud.httpRequest({
-            url            : url,
-            followRedirects: true,
-            params         : {type: 'large'}
-        });
+    if (!facebook) {
+        return res.error('Not logged with facebook');
+    }
 
-    }).then(function (httpResponse) {
-        var buffer    = httpResponse.buffer;
-        var base64    = buffer.toString('base64');
-        var parseFile = new Parse.File('image.jpg', {base64: base64});
-        return parseFile.save();
-    }).then(function (savedFile) {
+    let profilePictureUrl = 'https://graph.facebook.com/' + facebook + '/picture';
+
+    return Parse.Cloud.httpRequest({
+        url            : profilePictureUrl,
+        followRedirects: true,
+        params         : {type: 'large'}
+    }).then(httpResponse=> {
+        let buffer = httpResponse.buffer;
+        let base64 = buffer.toString('base64');
+        return new Parse.File('image.jpg', {base64: base64}).save();
+    }).then(savedFile=> {
         user.set({'photo': savedFile});
         return user.save(null, {sessionToken: user.getSessionToken()});
-    }).then(function (success) {
-        res.success(success);
-    }, function (error) {
-        res.error(error);
-    });
+    }).then(success=>res.success(success), error=> res.error(error.message));
 }
 
 function validateUsername(req, res) {
@@ -873,6 +873,20 @@ function validateEmail(req, res) {
 }
 
 
+// Album Gallery
+function incrementAlbumGallery(user) {
+    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
+        return user.increment('albumTotal').save(null, {useMasterKey: true})
+    });
+}
+
+function decrementAlbumGallery(user) {
+    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
+        return user.increment('albumTotal', 1).save(null, {useMasterKey: true})
+    });
+}
+
+// Gallery
 function incrementGallery(user) {
     return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
         return user.increment('galleriesTotal').save(null, {useMasterKey: true})
