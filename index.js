@@ -127,19 +127,3 @@ httpServer.listen(PORT, () => console.log('parse-server-example running on port 
 
 // This will enable the Live Query real-time server
 ParseServer.createLiveQueryServer(httpServer);
- 
-
-// Socket.io Server
-/*
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-
-io.on('connection', function(socket){
-    console.log('a user connected');
-});
-
-http.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
-// This will enable the Live Query real-time server
-ParseServer.createLiveQueryServer(http);
-/*
-
