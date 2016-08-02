@@ -37,24 +37,22 @@ let ServerConfig = {
     //liveQuery       : {
     //    classNames: ['GalleryComment']
     //},
+    // Ionic Cordova Parse Push Plugin
+    // https://github.com/taivo/parse-push-plugin
+    // Uncomment for Push
+    // push : {
+    //     android: {
+    //         senderId: 'yourSenderId',
+    //         apiKey  : 'yourApiKey'
+    //     },
+    //     ios    : {
+    //         pfx       : 'pfx',
+    //         bundleId  : 'bundleId',
+    //         production: 'production'
+    //     }
+    // }
 };
 
-// Parse Push
-let PUSH = process.env.PUSH;
-if (PUSH) {
-    PUSH = JSON.parse(PUSH);
-    ServerConfig.push = {
-        android: {
-            senderId: PUSH.android.senderId,
-            apiKey  : PUSH.android.apiKey
-        },
-        ios    : {
-            pfx       : PUSH.ios.pfx,
-            bundleId  : PUSH.ios.bundleId,
-            production: PUSH.ios.production
-        }
-    };
-}
 
 // File Local
 const UPLOAD_LOCAL_PATH = process.env.UPLOAD_LOCAL_PATH;

@@ -816,11 +816,6 @@ function saveFacebookPicture(req, res, next) {
     if (!user) {
         return res.error('Not Authorized');
     }
-
-    if (user.attributes.photo.length) {
-        return res.success('Photo user')
-    }
-
     let facebook = user.attributes.facebook;
 
 
