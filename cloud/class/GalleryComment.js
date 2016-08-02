@@ -1,16 +1,16 @@
 'use strict';
-const Image           = require('../helpers/image');
-const User            = require('./../class/User');
+const Image = require('../helpers/image');
+const User = require('./../class/User');
 const GalleryActivity = require('./../class/GalleryActivity');
-const ParseObject     = Parse.Object.extend('GalleryComment');
-module.exports        = {
+const ParseObject = Parse.Object.extend('GalleryComment');
+module.exports = {
     beforeSave: beforeSave,
-    afterSave : afterSave
+    afterSave: afterSave
 };
 
 function beforeSave(req, res) {
     var comment = req.object;
-    var user    = req.user;
+    var user = req.user;
     var gallery = comment.get('gallery');
 
     if (!user) {
@@ -37,17 +37,25 @@ function afterSave(req, res) {
     if (req.object.existed()) {
         return
     }
+    new Parse.Query('Gallery')
+        .equalTo('objectId', comment.get('gallery').id)
+        .first({useMasterKey: true})
+        .then(gallery => {
 
-    let activity = {
-        action  : 'photoCommented',
-        fromUser: req.user,
-        toUser  : comment.get('gallery').user,
-        gallery : comment.get('gallery')
-    };
+            let activity = {
+                action: 'comment',
+                fromUser: req.user,
+                comment: comment,
+                toUser: gallery.attributes.user,
+                gallery: gallery
+            };
 
-    console.log('after comment', activity);
-    return Parse.Promise.when([
-        GalleryActivity.create(activity),
-        User.incrementComment(req.user)
-    ]);
+            return Parse.Promise.when([
+                GalleryActivity.create(activity),
+                User.incrementComment(req.user)
+            ]);
+
+        })
+
+
 }

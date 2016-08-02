@@ -20,69 +20,73 @@ function afterSave(req, res) {
         return;
     }
 
-    console.log('afterSave', req);
+    console.log('afterSave', req.object.attributes);
 
-
-    Parse.Promise.when([
+    let promises = [
         new Parse.Query('User').equalTo('objectId', req.object.get('fromUser').id).first({
             useMasterKey: true
         }),
         new Parse.Query('User').equalTo('objectId', req.object.get('toUser').id).first({
             useMasterKey: true
         })
-    ]).then(result => {
-        const fromUser = result[0];
-        const toUser = result[1];
-        const action = req.object.get('action');
+    ];
+
+    if (req.object.get('comment')) {
+        promises.push(new Parse.Query('GalleryComment').equalTo('objectId', req.object.get('comment').id).first({
+            useMasterKey: true
+        }));
+    }
+
+    Parse.Promise.when(promises).then(result => {
+        let fromUser = result[0];
+        let toUser = result[1];
+        let action = req.object.get('action');
+        let UserLang = toUser.attributes.lang || 'en';
+        let lang = require('./../helpers/loadJson')(__dirname + '/../../i18n/' + UserLang + '.json');
         let channel = toUser.attributes.username;
 
-        Parse.Push.send({
-                channels: [channel],
-                data: {
-                    alert: alertMessage(action, result[0].attributes.name), // Set our alert message.
-                    badge: 'Increment', // Increment the target device's badge count.
-                    // The following keys help Anypic load the correct photo in response to this push notification.
-                    p: 'a', // Payload Type: Activity
-                    t: 'c', // Activity Type: Comment
-                    fu: fromUser.id, // From User
-                    pid: toUser.id // Photo Id
-                }
-            }, {
-                useMasterKey: true
-            })
-            .then(function() {
-                console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
-                res.success({
-                    status: 'push sent',
-                    ts: Date.now()
+        if (lang[action]) {
+            let message = fromUser.attributes.name + lang[action];
+
+            // if comment your photo
+            if (result.length > 2) {
+                message = message + '"' + result[2].attributes.text + '"';
+            }
+
+            // Trim our message to 140 characters.
+            if (message.length > 140) {
+                message = message.substring(0, 140);
+            }
+
+            console.log(message);
+
+            Parse.Push.send({
+                    channels: [channel],
+                    data: {
+                        alert: message, // Set our alert message.
+                        badge: 'Increment', // Increment the target device's badge count.
+                        // The following keys help Anypic load the correct photo in response to this push notification.
+                        p: 'a', // Payload Type: Activity
+                        t: 'c', // Activity Type: Comment
+                        fu: fromUser.id, // From User
+                        pid: toUser.id // Photo Id
+                    }
+                }, {
+                    useMasterKey: true
+                })
+                .then(function() {
+                    console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
+                    res.success({
+                        status: 'push sent',
+                        ts: Date.now()
+                    });
+                }, function(error) {
+                    console.log('push failed. ' + JSON.stringify(error) + '\n');
+                    res.error(error);
                 });
-            }, function(error) {
-                console.log('push failed. ' + JSON.stringify(error) + '\n');
-                res.error(error);
-            });
+        }
+
     });
-}
-
-function alertMessage(action, userName) {
-
-    let message = '';
-    console.log('alertMessage', action)
-
-    if (action === 'comment') {
-        message = userName + ' commented on your photo.';
-    } else if (action === 'like') {
-        message = userName + ' likes your photo.';
-    } else if (action === 'followUser') {
-        message = userName + ' is now following you.';
-    }
-
-    // Trim our message to 140 characters.
-    if (message.length > 140) {
-        message = message.substring(0, 140);
-    }
-
-    console.log('message', action, message)
-    return message;
 }
 
 function create(obj, acl) {
@@ -94,6 +98,14 @@ function create(obj, acl) {
 
     if (obj.toUser) {
         newActivity.set('toUser', obj.toUser);
+    }
+
+    if (obj.comment) {
+        newActivity.set('comment', obj.comment);
+    }
+
+    if (obj.gallery) {
+        newActivity.set('gallery', obj.gallery);
     }
 
     if (acl) {

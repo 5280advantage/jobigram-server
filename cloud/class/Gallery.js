@@ -543,7 +543,7 @@ function likeGallery(req, res, next) {
             fromUser: user,
             gallery : objParse,
             action  : response.action,
-            toUser  : objParse.user
+            toUser  : objParse.attributes.user
         };
 
         console.log('step4', activity);
