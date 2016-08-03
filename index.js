@@ -60,7 +60,7 @@ let ServerConfig = {
             senderId: "285805785383",
             apiKey  : "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
         }
-    }
+    } 
 };
 
 
