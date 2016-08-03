@@ -46,12 +46,12 @@ let ServerConfig = {
     push            : {
         ios    : [
             {
-                pfx       : './keys/ios_dev.p12',
+                pfx       : __dirname + '/keys/ios_dev.p12',
                 bundleId  : 'com.agenciafoccus.photogram',
                 production: false
             },
             {
-                pfx       : './keys/ios_prod.p12',
+                pfx       : __dirname + '/keys/ios_prod.p12',
                 bundleId  : 'com.agenciafoccus.photogram',
                 production: true
             }
@@ -60,7 +60,7 @@ let ServerConfig = {
             senderId: "285805785383",
             apiKey  : "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
         }
-    } 
+    }
 };
 
 
