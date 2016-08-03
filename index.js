@@ -44,18 +44,18 @@ let ServerConfig = {
         classNames: ['GalleryActivity']
     },
     push            : {
-        ios    : [
-            {
-                pfx       : __dirname + '/keys/ios_dev.p12',
-                bundleId  : 'com.agenciafoccus.photogram',
-                production: false
-            },
-            {
-                pfx       : __dirname + '/keys/ios_prod.p12',
-                bundleId  : 'com.agenciafoccus.photogram',
-                production: true
-            }
-        ],
+        //ios    : [
+        //    {
+        //        pfx       : __dirname + '/keys/ios_dev.p12',
+        //        bundleId  : 'com.agenciafoccus.photogram',
+        //        production: false
+        //    },
+        //    {
+        //        pfx       : __dirname + '/keys/ios_prod.p12',
+        //        bundleId  : 'com.agenciafoccus.photogram',
+        //        production: true
+        //    }
+        //],
         android: {
             senderId: "285805785383",
             apiKey  : "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
