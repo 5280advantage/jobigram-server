@@ -92,11 +92,22 @@ const MAILGUN_DOMAIN       = process.env.MAILGUN_DOMAIN;
 const MAILGUN_FROM_ADDRESS = process.env.MAILGUN_FROM_ADDRESS;
 if (MAILGUN_API_KEY) {
     ServerConfig.emailAdapter = {
-        module : 'parse-server-simple-mailgun-adapter',
+        module : 'parse-server-mailgun-adapter-template',
         options: {
-            apiKey     : MAILGUN_API_KEY,
-            fromAddress: MAILGUN_DOMAIN,
-            domain     : MAILGUN_FROM_ADDRESS,
+            // Your API key from mailgun.com
+            apiKey              : MAILGUN_API_KEY,
+            // The address that your emails come from
+            fromAddress         : MAILGUN_DOMAIN,
+            // Your domain from mailgun.com
+            domain              : MAILGUN_FROM_ADDRESS,
+            // Verification email subject
+            verificationSubject : 'Please verify your e-mail for %appname%',
+            // Verification email body
+            verificationBody    : 'Hi,\n\nYou are being asked to confirm the e-mail address %email% with %appname%\n\nClick here to confirm it:\n%link%',
+            // Password reset email subject
+            passwordResetSubject: 'Password Reset Request for %appname%',
+            // Password reset email body
+            passwordResetBody   : 'Hi,\n\nYou requested a password reset for %appname%.\n\nClick here to reset it:\n%link%'
         }
     };
 }
