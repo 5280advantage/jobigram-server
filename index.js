@@ -28,32 +28,39 @@ if (!DATABASE_URI) {
 }
 
 let ServerConfig = {
-    databaseURI             : DATABASE_URI,
-    cloud                   : CLOUD_CODE_MAIN,
-    appId                   : APP_ID,
-    masterKey               : MASTER_KEY,
-    serverURL               : SERVER_URL,
-    restAPIKey              : MASTER_REST_KEY,
-    publicServerURL         : SERVER_URL,
-    appName                 : APP_NAME,
-    verifyUserEmails        : false,
+    databaseURI     : DATABASE_URI,
+    cloud           : CLOUD_CODE_MAIN,
+    appId           : APP_ID,
+    masterKey       : MASTER_KEY,
+    serverURL       : SERVER_URL,
+    restAPIKey      : MASTER_REST_KEY,
+    publicServerURL : SERVER_URL,
+    appName         : APP_NAME,
+    verifyUserEmails: false,
     // enableAnonymousUsers    : true,
     // allowClientClassCreation: true,
-    maxUploadSize           : '10mb',
-    liveQuery               : {
+    maxUploadSize   : '10mb',
+    liveQuery       : {
         classNames: ['GalleryActivity']
     },
-    push: {
-      ios:{
-         pfx: "$RELATIVE_PATH_TO_YOUR_p12_FILE",
-         bundleId: "$RELATIVE_PATH_TO_YOUR_p12_FILE",
-         production: false
-      },
-      android:{
-         senderId: "285805785383",
-         apiKey: "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
-      }
-   }
+    push            : {
+        ios    : [
+            {
+                pfx       : './keys/ios_dev.p12',
+                bundleId  : 'com.agenciafoccus.photogram',
+                production: false
+            },
+            {
+                pfx       : './keys/ios_prod.p12',
+                bundleId  : 'com.agenciafoccus.photogram',
+                production: true
+            }
+        ],
+        android: {
+            senderId: "285805785383",
+            apiKey  : "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
+        }
+    }
 };
 
 
