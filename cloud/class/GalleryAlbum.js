@@ -16,8 +16,15 @@ module.exports = {
 function afterDelete(req, res) {
     // Remove All Gallerys
     new Parse.Query('Gallery').equalTo('album', req.object).find({
-        success: comments=> {
-            Parse.Object.destroyAll(comments, {
+        success: items=> {
+
+            // Decrement User Photos
+            _.each(items, item => {
+                User.decrementGallery(req.user);
+            });
+
+            // Remove all Photos
+            Parse.Object.destroyAll(items, {
                 success: ()=> {},
                 error  : error =>console.error("Error deleting related comments " + error.code + ": " + error.message)
             });
