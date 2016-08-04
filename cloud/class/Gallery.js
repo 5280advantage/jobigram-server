@@ -19,20 +19,6 @@ module.exports = {
     likeGallery   : likeGallery,
 };
 
-function afterDelete(req, res) {
-    new Parse.Query('GalleryComment')
-        .equalTo('gallery', req.object)
-        .find({
-            success: comments=> {
-                Parse.Object.destroyAll(comments, {
-                    success: ()=> {},
-                    error  : error =>console.error("Error deleting related comments " + error.code + ": " + error.message)
-                });
-            },
-            error  : error=>console.error("Error finding related comments " + error.code + ": " + error.message)
-        });
-}
-
 
 function beforeSave(req, res) {
     const gallery = req.object;
@@ -125,9 +111,14 @@ function afterDelete(req, res) {
 
     });
 
+    let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id).first({useMasterKey: true}).then(galleryAlbum=> {
+            return galleryAlbum.increment('qtyPhotos', -1).save(null, {useMasterKey: true})
+    });
+
     Parse.Promise.when([
         deleteActivity,
-        deleteComments
+        deleteComments,
+        decrementAlbum
     ]).then(res.success, res.error);
 
 
