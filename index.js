@@ -17,6 +17,7 @@ const MASTER_REST_KEY = process.env.MASTER_REST_KEY || 'myRestApiKey';
 const APP_NAME        = process.env.APP_NAME || 'parseApp';
 const PARSE_MOUNT     = process.env.PARSE_MOUNT || '/parse';
 const CLOUD_CODE_MAIN = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js';
+const REDIS_URL       = process.env.REDIS_URL;
 
 // Parse Push Android
 let PUSH_ANDROID_SENDER  = process.env.PUSH_ANDROID_SENDER;
@@ -41,7 +42,8 @@ let ServerConfig = {
     // allowClientClassCreation: true,
     maxUploadSize   : '10mb',
     liveQuery       : {
-        classNames: ['GalleryActivity']
+        classNames: ['GalleryActivity'],
+        redisURL  : REDIS_URL
     },
     push            : {
         //ios    : [
