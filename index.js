@@ -43,7 +43,7 @@ let ServerConfig = {
     maxUploadSize   : '10mb',
     liveQuery       : {
         classNames: ['GalleryActivity', 'Chat'],
-        redisURL  : REDIS_URL
+        //redisURL  : REDIS_URL
     },
     push            : {
         //ios    : [
