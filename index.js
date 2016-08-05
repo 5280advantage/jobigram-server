@@ -42,7 +42,7 @@ let ServerConfig = {
     // allowClientClassCreation: true,
     maxUploadSize   : '10mb',
     liveQuery       : {
-        classNames: ['GalleryActivity'],
+        classNames: ['GalleryActivity', 'Chat'],
         redisURL  : REDIS_URL
     },
     push            : {
