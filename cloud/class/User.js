@@ -503,6 +503,20 @@ function beforeSave(req, res) {
         return res.success();
     }
 
+    if (!user.get('username') || !user.dirty('username')) {
+        let username = user.get('email').spit('@');
+        user.set('username', username[0]);
+    }
+
+    //https://parse.com/docs/js/guide#performance-implement-efficient-searches
+    let toLowerCase = w => w.toLowerCase();
+    var words       = user.get('name').split(/\b/);
+    words           = _.map(words, toLowerCase);
+
+    // add username
+    words.push(user.get('username'));
+    user.set('words', words);
+
     var imageUrl = user.get('photo').url();
 
     Image.resize(imageUrl, 160, 160)
@@ -681,8 +695,21 @@ function listUsers(req, res, next) {
     const params = req.params;
     const _page  = req.params.page || 1;
     const _limit = req.params.limit || 24;
+    let _query = new Parse.Query(Parse.User);
 
-    new Parse.Query(Parse.User)
+
+    if (params.search) {
+        let toLowerCase = w => w.toLowerCase();
+        var words       = params.search.split(/\b/);
+        words           = _.map(words, toLowerCase);
+
+        if (words) {
+            _query.containsAll('words', [words]);
+        }
+
+    }
+    
+    _query
         .descending('createdAt')
         .notContainedIn('objectId', [req.user.id])
         .limit(_limit)
