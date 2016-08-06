@@ -95,7 +95,7 @@ const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
 const MAILGUN_FROM_ADDRESS = process.env.MAILGUN_FROM_ADDRESS;
 if (MAILGUN_API_KEY) {
     ServerConfig.emailAdapter = {
-        module: 'parse-server-mailgun-adapter-template',
+        module: 'parse-server-simple-mailgun-adapter',
         options: {
             // The address that your emails come from
             fromAddress: MAILGUN_FROM_ADDRESS,
