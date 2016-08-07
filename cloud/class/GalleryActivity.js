@@ -1,13 +1,13 @@
 'use strict';
-const _ = require('lodash');
-const User = require('./../class/User');
+const _           = require('lodash');
+const User        = require('./../class/User');
 const ParseObject = Parse.Object.extend('GalleryActivity');
-const UserFollow = Parse.Object.extend('UserFollow');
+const UserFollow  = Parse.Object.extend('UserFollow');
 
 module.exports = {
     afterSave: afterSave,
-    create: create,
-    feed: feed,
+    create   : create,
+    feed     : feed,
 };
 
 function afterSave(req, res) {
@@ -39,11 +39,11 @@ function afterSave(req, res) {
 
     Parse.Promise.when(promises).then(result => {
         let fromUser = result[0];
-        let toUser = result[1];
-        let action = req.object.get('action');
+        let toUser   = result[1];
+        let action   = req.object.get('action');
         let UserLang = toUser.attributes.lang || 'en';
-        let lang = require('./../helpers/loadJson')(__dirname + '/../../i18n/' + UserLang + '.json');
-        let channel = toUser.attributes.username;
+        let lang     = require('./../helpers/loadJson')(__dirname + '/../../i18n/' + UserLang + '.json');
+        let channel  = toUser.attributes.username;
 
         if (lang[action]) {
             let message = fromUser.attributes.name + lang[action];
@@ -61,29 +61,29 @@ function afterSave(req, res) {
             console.log(message);
 
             Parse.Push.send({
-                    channels: [channel],
-                    data: {
-                        alert: message, // Set our alert message.
-                        badge: 'Increment', // Increment the target device's badge count.
-                        // The following keys help Anypic load the correct photo in response to this push notification.
-                        p: 'a', // Payload Type: Activity
-                        t: 'c', // Activity Type: Comment
-                        fu: fromUser.id, // From User
-                        pid: toUser.id // Photo Id
-                    }
-                }, {
-                    useMasterKey: true
-                })
-                .then(function() {
-                    console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
-                    res.success({
-                        status: 'push sent',
-                        ts: Date.now()
-                    });
-                }, function(error) {
-                    console.log('push failed. ' + JSON.stringify(error) + '\n');
-                    res.error(error);
-                });
+                channels: [channel],
+                data    : {
+                    alert: message, // Set our alert message.
+                    badge: 'Increment', // Increment the target device's badge count.
+                    // The following keys help Anypic load the correct photo in response to this push notification.
+                    p    : 'a', // Payload Type: Activity
+                    t    : 'c', // Activity Type: Comment
+                    fu   : fromUser.id, // From User
+                    pid  : toUser.id // Photo Id
+                }
+            }, {
+                useMasterKey: true
+            })
+                 .then(function () {
+                     console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
+                     res.success({
+                         status: 'push sent',
+                         ts    : Date.now()
+                     });
+                 }, function (error) {
+                     console.log('push failed. ' + JSON.stringify(error) + '\n');
+                     res.error(error);
+                 });
         }
 
     });
@@ -118,7 +118,7 @@ function create(obj, acl) {
 }
 
 function feed(req, res, next) {
-    const _page = req.params.page || 1;
+    const _page  = req.params.page || 1;
     const _limit = req.params.limit || 10;
 
     console.log('Start feed', req.params);
@@ -146,15 +146,15 @@ function feed(req, res, next) {
             _.each(data, item => {
 
                 let userGet = item.get('fromUser');
-                new Parse.Query('UserData').equalTo('user', userGet).first().then(user => {
+                new Parse.Query('UserData').equalTo('user', userGet).first().then(_userData => {
 
                     let obj = {
-                        item: item,
-                        action: item.get('action'),
+                        item     : item,
+                        action   : item.get('action'),
                         createdAt: item.get('createdAt'),
                     };
 
-                    if (user) {
+                    if (_userData) {
 
                         new Parse.Query(UserFollow)
                             .equalTo('from', req.user)
@@ -163,12 +163,12 @@ function feed(req, res, next) {
                             .then(isFollow => {
                                 console.log(isFollow);
                                 obj.user = {
-                                    obj: user,
-                                    id: user.id,
-                                    name: user.get('name'),
-                                    username: user.get('username'),
-                                    status: user.get('status'),
-                                    photo: user.get('photo'),
+                                    obj     : _userData.get('user'),
+                                    id      : _userData.get('user').id,
+                                    name    : _userData.get('name'),
+                                    username: _userData.get('username'),
+                                    status  : _userData.get('status'),
+                                    photo   : _userData.get('photo'),
                                     isFollow: isFollow > 0 ? true : false
                                 };
                                 _result.push(obj);
