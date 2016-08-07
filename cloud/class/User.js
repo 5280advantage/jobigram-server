@@ -46,9 +46,17 @@ function beforeSave(req, res) {
         return res.error('Role cannot be changed');
     }
 
+    if (!user.get('username')) {
+        let username = user.get('email');
+        if (username) {
+            username = _.split(username, '@');
+            user.set('username', username[0]);
+        }
+    }
+
     //https://parse.com/docs/js/guide#performance-implement-efficient-searches
     let toLowerCase = w => w.toLowerCase();
-    var words       = user.get('name').split(/\b/);
+    let words       = _.split(user.get('name'), /\b/);
     words           = _.map(words, toLowerCase);
     words           = _.map(words, (item)=> { if (item) return item});
 
@@ -57,8 +65,8 @@ function beforeSave(req, res) {
     user.set('words', words);
 
 
-    if (user.get('photo') || user.dirty('photo')) {
-        var imageUrl = user.get('photo').url();
+    if (user.get('photo') && user.get('photo').url()) {
+        let imageUrl = user.get('photo').url();
         Image.resize(imageUrl, 160, 160)
              .then(base64=> Image.saveImage(base64))
              .then(savedFile=> {
@@ -692,8 +700,8 @@ function getUsers(req, res, next) {
 
 function listUsers(req, res, next) {
     const _params = req.params;
-    const _page  = req.params.page || 1;
-    const _limit = req.params.limit || 24;
+    const _page   = req.params.page || 1;
+    const _limit  = req.params.limit || 24;
 
     let _query = new Parse.Query(Parse.User);
 
