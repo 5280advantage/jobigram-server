@@ -47,8 +47,10 @@ function beforeSave(req, res) {
     }
 
     if (!user.get('username') || !user.dirty('username')) {
-        let username = user.get('email').split('@');
-        user.set('username', username[0]);
+        let username = user.get('email');
+        if (username) {
+            user.set('username', username.split('@')[0]);
+        }
     }
 
     //https://parse.com/docs/js/guide#performance-implement-efficient-searches
@@ -697,8 +699,8 @@ function getUsers(req, res, next) {
 
 function listUsers(req, res, next) {
     const _params = req.params;
-    const _page  = req.params.page || 1;
-    const _limit = req.params.limit || 24;
+    const _page   = req.params.page || 1;
+    const _limit  = req.params.limit || 24;
 
     let _query = new Parse.Query(Parse.User);
 
