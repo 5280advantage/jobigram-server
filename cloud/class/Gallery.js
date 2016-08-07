@@ -111,9 +111,10 @@ function afterDelete(req, res) {
 
     });
 
-    let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id).first({useMasterKey: true}).then(galleryAlbum=> {
+    let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id)
+                                                        .first({useMasterKey: true}).then(galleryAlbum=> {
             return galleryAlbum.increment('qtyPhotos', -1).save(null, {useMasterKey: true})
-    });
+        });
 
     Parse.Promise.when([
         deleteActivity,
@@ -218,17 +219,17 @@ function search(req, res, next) {
 
     let _query = new Parse.Query(ParseObject);
 
-    let text = req.params.search;
+    let text = params.search;
 
-    if (text) {
+    if (text && text.length > 0) {
         let toLowerCase = w => w.toLowerCase();
-        var words       = text.split(/\b/);
+        let words       = text.split(/\b/);
         words           = _.map(words, toLowerCase);
 
-        var stopWords = ['the', 'in', 'and']
+        let stopWords = ['the', 'in', 'and']
         words         = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
 
-        var hashtags = text.match(/#.+?\b/g);
+        let hashtags = text.match(/#.+?\b/g);
         hashtags     = _.map(hashtags, toLowerCase);
 
         if (words) {
