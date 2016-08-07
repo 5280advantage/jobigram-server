@@ -47,7 +47,7 @@ function beforeSave(req, res) {
     }
 
     if (!user.get('username') || !user.dirty('username')) {
-        let username = user.attributes.email.split('@');
+        let username = user.get('email').split('@');
         user.set('username', username[0]);
     }
 
