@@ -156,7 +156,6 @@ function feed(req, res, next) {
 
                     if (user) {
 
-
                         new Parse.Query(UserFollow)
                             .equalTo('from', req.user)
                             .equalTo('to', user)
