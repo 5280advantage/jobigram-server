@@ -65,8 +65,8 @@ function beforeSave(req, res) {
     user.set('words', words);
 
 
-    if (user.get('photo') || user.dirty('photo')) {
-        var imageUrl = user.get('photo').url();
+    if (user.get('photo')) {
+        let imageUrl = user.get('photo').url();
         Image.resize(imageUrl, 160, 160)
              .then(base64=> Image.saveImage(base64))
              .then(savedFile=> {
