@@ -39,6 +39,120 @@ module.exports = {
     decrementAlbumGallery: decrementAlbumGallery,
 };
 
+function beforeSave(req, res) {
+    var user = req.object;
+
+    if (user.existed() && user.dirty('roleName')) {
+        return res.error('Role cannot be changed');
+    }
+
+    if (!user.get('username') || !user.dirty('username')) {
+        let username = user.attributes.email.split('@');
+        user.set('username', username[0]);
+    }
+
+    //https://parse.com/docs/js/guide#performance-implement-efficient-searches
+    let toLowerCase = w => w.toLowerCase();
+    var words       = user.get('name').split(/\b/);
+    words           = _.map(words, toLowerCase);
+    words           = _.map(words, (item)=> { if (item) return item});
+
+    // add username
+    words.push(user.get('username'));
+    user.set('words', words);
+
+
+    if (user.get('photo') || user.dirty('photo')) {
+        var imageUrl = user.get('photo').url();
+        Image.resize(imageUrl, 160, 160)
+             .then(base64=> Image.saveImage(base64))
+             .then(savedFile=> {
+                 user.set('photo', savedFile);
+                 res.success();
+             }, error=>res.error(error));
+    } else {
+        return res.success();
+    }
+
+
+}
+
+function afterSave(req, res) {
+    var user           = req.object;
+    var userRequesting = req.user;
+
+    console.log('user.existed', user.existed());
+
+    new Parse.Query('UserData').equalTo('user', user).first({useMasterKey: true}).then(userData => {
+
+        if (userData) {
+            userData.set('name', user.get('name'));
+            userData.set('status', user.get('status'));
+            userData.set('username', user.get('username'));
+            userData.set('photo', user.get('photo'));
+
+            // Define type increment
+            userData.increment('galleriesTotal', 0);
+            userData.increment('followersTotal', 0);
+            userData.increment('followingsTotal', 0);
+            userData.increment('albumTotal', 0);
+        } else {
+
+            const roleACL = new Parse.ACL();
+            roleACL.setPublicReadAccess(true);
+            roleACL.setWriteAccess(user, true);
+
+            userData = new Parse.Object('UserData', {
+                user           : user,
+                ACL            : roleACL,
+                name           : user.get('name'),
+                username       : user.get('username'),
+                status         : user.get('status'),
+                photo          : user.get('photo'),
+                galleriesTotal : 0,
+                followersTotal : 0,
+                followingsTotal: 0,
+            });
+        }
+        userData.save(null, {useMasterKey: true});
+    });
+
+    if (!user.existed()) {
+
+        var query = new Parse.Query(Parse.Role);
+        query.equalTo('name', 'Admin');
+        query.equalTo('users', userRequesting);
+        query.first().then(function (isAdmin) {
+
+            if (!isAdmin && user.get('roleName') === 'Admin') {
+                return Parse.Promise.error(new Parse.Error(1, 'Not Authorized'));
+            }
+
+            var roleName = user.get('roleName') || 'User';
+
+            var innerQuery = new Parse.Query(Parse.Role);
+            innerQuery.equalTo('name', roleName);
+            return innerQuery.first();
+        }).then(function (role) {
+
+            if (!role) {
+                return Parse.Promise.error(new Parse.Error(1, 'Role not found'));
+            }
+
+            role.getUsers().add(user);
+            return role.save();
+        }).then(function () {
+            console.log(success);
+        }, function (error) {
+            console.error('Got an error ' + error.code + ' : ' + error.message);
+        })
+    }
+}
+
+function afterDelete(req, res) {
+
+}
+
 
 function getLikers(req, res) {
     const params = req.params;
@@ -492,103 +606,7 @@ function avatar(obj) {
         return obj.img ? obj.img._url : 'img/user.png';
     }
 }
-function beforeSave(req, res) {
-    var user = req.object;
 
-    if (user.existed() && user.dirty('roleName')) {
-        return res.error('Role cannot be changed');
-    }
-
-    if (!user.get('photo') || !user.dirty('photo')) {
-        return res.success();
-    }
-
-    var imageUrl = user.get('photo').url();
-
-    Image.resize(imageUrl, 160, 160)
-         .then(base64=> Image.saveImage(base64))
-         .then(savedFile=> {
-             user.set('photo', savedFile);
-             res.success();
-         }, error=>res.error(error));
-
-}
-
-
-function afterDelete(req, res) {
-
-}
-function afterSave(req, res) {
-    var user           = req.object;
-    var userRequesting = req.user;
-
-    console.log('user.existed', user.existed());
-
-    new Parse.Query('UserData').equalTo('user', user).first({useMasterKey: true}).then(userData => {
-
-        if (userData) {
-            userData.set('name', user.get('name'));
-            userData.set('status', user.get('status'));
-            userData.set('username', user.get('username'));
-            userData.set('photo', user.get('photo'));
-
-            // Define type increment
-            userData.increment('galleriesTotal', 0);
-            userData.increment('followersTotal', 0);
-            userData.increment('followingsTotal', 0);
-            userData.increment('albumTotal', 0);
-        } else {
-
-            const roleACL = new Parse.ACL();
-            roleACL.setPublicReadAccess(true);
-            roleACL.setWriteAccess(user, true);
-
-            userData = new Parse.Object('UserData', {
-                user           : user,
-                ACL            : roleACL,
-                name           : user.get('name'),
-                username       : user.get('username'),
-                status         : user.get('status'),
-                photo          : user.get('photo'),
-                galleriesTotal : 0,
-                followersTotal : 0,
-                followingsTotal: 0,
-            });
-        }
-        userData.save(null, {useMasterKey: true});
-    });
-
-    if (!user.existed()) {
-
-        var query = new Parse.Query(Parse.Role);
-        query.equalTo('name', 'Admin');
-        query.equalTo('users', userRequesting);
-        query.first().then(function (isAdmin) {
-
-            if (!isAdmin && user.get('roleName') === 'Admin') {
-                return Parse.Promise.error(new Parse.Error(1, 'Not Authorized'));
-            }
-
-            var roleName = user.get('roleName') || 'User';
-
-            var innerQuery = new Parse.Query(Parse.Role);
-            innerQuery.equalTo('name', roleName);
-            return innerQuery.first();
-        }).then(function (role) {
-
-            if (!role) {
-                return Parse.Promise.error(new Parse.Error(1, 'Role not found'));
-            }
-
-            role.getUsers().add(user);
-            return role.save();
-        }).then(function () {
-            console.log(success);
-        }, function (error) {
-            console.error('Got an error ' + error.code + ' : ' + error.message);
-        })
-    }
-}
 
 function createUser(req, res, next) {
     var data = req.params;
@@ -678,11 +696,25 @@ function getUsers(req, res, next) {
 }
 
 function listUsers(req, res, next) {
-    const params = req.params;
+    const _params = req.params;
     const _page  = req.params.page || 1;
     const _limit = req.params.limit || 24;
 
-    new Parse.Query(Parse.User)
+    let _query = new Parse.Query(Parse.User);
+
+    if (_params.search) {
+        let toLowerCase = w => w.toLowerCase();
+        var words       = _params.search.split(/\b/);
+        words           = _.map(words, toLowerCase);
+        let stopWords   = ['the', 'in', 'and']
+        words           = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
+
+        if (words) {
+            _query.containsAll('words', [words]);
+        }
+    }
+
+    _query
         .descending('createdAt')
         .notContainedIn('objectId', [req.user.id])
         .limit(_limit)
