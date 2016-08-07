@@ -158,7 +158,7 @@ function feed(req, res, next) {
 
                         new Parse.Query(UserFollow)
                             .equalTo('from', req.user)
-                            .equalTo('to', item.fromUser)
+                            .equalTo('to', userGet)
                             .count()
                             .then(isFollow => {
                                 console.log(isFollow);
