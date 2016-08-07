@@ -696,21 +696,22 @@ function getUsers(req, res, next) {
 }
 
 function listUsers(req, res, next) {
-    const params = req.params;
+    const _params = req.params;
     const _page  = req.params.page || 1;
     const _limit = req.params.limit || 24;
-    let _query   = new Parse.Query(Parse.User);
 
+    let _query = new Parse.Query(Parse.User);
 
-    if (params.search) {
+    if (_params.search) {
         let toLowerCase = w => w.toLowerCase();
-        var words       = params.search.split(/\b/);
+        var words       = _params.search.split(/\b/);
         words           = _.map(words, toLowerCase);
+        let stopWords   = ['the', 'in', 'and']
+        words           = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
 
         if (words) {
             _query.containsAll('words', [words]);
         }
-
     }
 
     _query
