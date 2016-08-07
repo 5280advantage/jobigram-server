@@ -45,10 +45,18 @@ function beforeSave(req, res) {
     if (user.existed() && user.dirty('roleName')) {
         return res.error('Role cannot be changed');
     }
-    
+
+    if (!user.get('username')) {
+        let username = user.get('email');
+        if (username) {
+            username = _.split(username, '@');
+            user.set('username', username[0]);
+        }
+    }
+
     //https://parse.com/docs/js/guide#performance-implement-efficient-searches
     let toLowerCase = w => w.toLowerCase();
-    var words       = user.get('name').split(/\b/);
+    let words       = _.split(user.get('name'), /\b/);
     words           = _.map(words, toLowerCase);
     words           = _.map(words, (item)=> { if (item) return item});
 
