@@ -235,10 +235,14 @@ function search(req, res, next) {
         if (words) {
             _query.containsAll('words', [words]);
         }
+        
+        console.log(words);
 
         if (hashtags) {
             _query.containsAll('hashtags', [hashtags]);
         }
+        
+        console.log(hashtags);
 
     }
 
