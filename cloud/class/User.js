@@ -55,6 +55,7 @@ function beforeSave(req, res) {
     let toLowerCase = w => w.toLowerCase();
     var words       = user.get('name').split(/\b/);
     words           = _.map(words, toLowerCase);
+    words           = _.map(words, (item)=> { if (item) return item});
 
     // add username
     words.push(user.get('username'));
