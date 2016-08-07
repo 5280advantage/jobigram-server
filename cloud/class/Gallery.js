@@ -221,7 +221,7 @@ function search(req, res, next) {
 
     let text = params.search;
 
-    if (text) {
+    if (text && text.length > 0) {
         let toLowerCase = w => w.toLowerCase();
         let words       = text.split(/\b/);
         words           = _.map(words, toLowerCase);
@@ -235,14 +235,10 @@ function search(req, res, next) {
         if (words) {
             _query.containsAll('words', [words]);
         }
-        
-        console.log(words);
 
         if (hashtags) {
             _query.containsAll('hashtags', [hashtags]);
         }
-        
-        console.log(hashtags);
 
     }
 
