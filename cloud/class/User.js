@@ -6,6 +6,7 @@ const UserFollow      = Parse.Object.extend('UserFollow');
 const UserData        = Parse.Object.extend('UserData');
 const Gallery         = Parse.Object.extend('Gallery');
 const _               = require('lodash');
+const MasterKey       = {useMasterKey: true};
 
 module.exports = {
     beforeSave           : beforeSave,
@@ -86,7 +87,7 @@ function afterSave(req, res) {
 
     console.log('user.existed', user.existed());
 
-    new Parse.Query('UserData').equalTo('user', user).first({useMasterKey: true}).then(userData => {
+    new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(userData => {
 
         if (userData) {
             userData.set('name', user.get('name'));
@@ -117,7 +118,7 @@ function afterSave(req, res) {
                 followingsTotal: 0,
             });
         }
-        userData.save(null, {useMasterKey: true});
+        userData.save(null, MasterKey);
     });
 
     if (!user.existed()) {
@@ -153,8 +154,8 @@ function afterSave(req, res) {
 }
 
 function afterDelete(req, res) {
-
-}
+    res.success();
+};
 
 
 function getLikers(req, res) {
@@ -171,7 +172,7 @@ function getLikers(req, res) {
             gallery
                 .relation('likes')
                 .query()
-                .find({useMasterKey: true})
+                .find(MasterKey)
                 .then(data=> {
 
                     let _result = [];
@@ -189,7 +190,7 @@ function getLikers(req, res) {
                         // User Data
                         new Parse.Query('UserData')
                             .equalTo('user', user)
-                            .first({useMasterKey: true})
+                            .first(MasterKey)
                             .then(userData=> {
 
                                 new Parse.Query('Gallery')
@@ -230,12 +231,12 @@ function getFollowers(req, res) {
     if (params.username) {
         new Parse.Query(ParseObject)
             .equalTo('username', params.username)
-            .first({useMasterKey: true})
+            .first(MasterKey)
             .then(user=> {
                 new Parse.Query(UserFollow)
                     .equalTo('to', user)
                     .include('user')
-                    .find({useMasterKey: true})
+                    .find(MasterKey)
                     .then(data=> {
 
                         let _result = [];
@@ -253,7 +254,7 @@ function getFollowers(req, res) {
                             // User Data
                             new Parse.Query('UserData')
                                 .equalTo('user', user.attributes.from)
-                                .first({useMasterKey: true})
+                                .first(MasterKey)
                                 .then(userData=> {
 
                                     new Parse.Query('Gallery')
@@ -291,7 +292,7 @@ function getFollowers(req, res) {
         new Parse.Query(UserFollow)
             .equalTo('to', req.user)
             .include('user')
-            .find({useMasterKey: true})
+            .find(MasterKey)
             .then(data=> {
 
                 let _result = [];
@@ -309,7 +310,7 @@ function getFollowers(req, res) {
                     // User Data
                     new Parse.Query('UserData')
                         .equalTo('user', user.attributes.to)
-                        .first({useMasterKey: true})
+                        .first(MasterKey)
                         .then(userData=> {
 
                             new Parse.Query('Gallery')
@@ -352,12 +353,12 @@ function getFollowing(req, res) {
     if (params.username) {
         new Parse.Query(ParseObject)
             .equalTo('username', params.username)
-            .first({useMasterKey: true})
+            .first(MasterKey)
             .then(user=> {
                 new Parse.Query(UserFollow)
                     .equalTo('from', user)
                     .include('user')
-                    .find({useMasterKey: true})
+                    .find(MasterKey)
                     .then(data=> {
 
                         let _result = [];
@@ -375,7 +376,7 @@ function getFollowing(req, res) {
                             // User Data
                             new Parse.Query('UserData')
                                 .equalTo('user', user.attributes.to)
-                                .first({useMasterKey: true})
+                                .first(MasterKey)
                                 .then(userData=> {
 
                                     new Parse.Query('Gallery')
@@ -413,7 +414,7 @@ function getFollowing(req, res) {
         new Parse.Query(UserFollow)
             .equalTo('from', req.user)
             .include('user')
-            .find({useMasterKey: true})
+            .find(MasterKey)
             .then(data=> {
 
                 let _result = [];
@@ -429,7 +430,7 @@ function getFollowing(req, res) {
                 _.each(data, user=> {
 
                     // User Data
-                    new Parse.Query('UserData').equalTo('user', user.attributes.to).first({useMasterKey: true})
+                    new Parse.Query('UserData').equalTo('user', user.attributes.to).first(MasterKey)
                                                .then(userData=> {
 
                                                    new Parse.Query('Gallery')
@@ -477,13 +478,13 @@ function follow(req, res) {
 
     new Parse.Query(Parse.User)
         .equalTo('objectId', params.userId)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(toUser=> {
 
             new Parse.Query(UserFollow)
                 .equalTo('from', req.user)
                 .equalTo('to', toUser)
-                .first({useMasterKey: true})
+                .first(MasterKey)
                 .then(isFollow=> {
 
 
@@ -508,7 +509,7 @@ function follow(req, res) {
                             .set('from', req.user)
                             .set('to', toUser)
                             .set('date', Date())
-                            .save(null, {useMasterKey: true})
+                            .save(null, MasterKey)
                             .then(data=> {
                                 Parse.Promise.when([
                                     incrementFollowing(req.user),
@@ -566,7 +567,7 @@ function profile(req, res) {
 
     new Parse.Query(Parse.User)
         .equalTo('username', req.params.username)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(user => {
             toUser = user;
             return new Parse.Query(UserData)
@@ -635,7 +636,7 @@ function createUser(req, res, next) {
                 .signUp()
                 .then(objUser=> {
                     objUser.setACL(new Parse.ACL(objUser));
-                    objUser.save(null, {useMasterKey: true});
+                    objUser.save(null, MasterKey);
                     res.success(objUser);
                 }, error=>res.error(error));
         }
@@ -645,7 +646,7 @@ function createUser(req, res, next) {
 function findUserByUsername(req, res, next) {
     new Parse.Query(Parse.User)
         .equalTo('username', req.params.username)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(user => {
             new Parse.Query(UserData)
                 .equalTo('user', user)
@@ -663,7 +664,7 @@ function findUserByUsername(req, res, next) {
 function findUserByEmail(req, res, next) {
     new Parse.Query(Parse.User)
         .equalTo('email', req.params.email)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(results => res.success(results || {}), error=> res.error(error.message));
 }
 
@@ -690,7 +691,7 @@ function getUsers(req, res, next) {
             query.limit(params.limit);
             query.skip((params.page * params.limit) - params.limit);
 
-            return Parse.Promise.when(query.find({useMasterKey: true}), query.count({useMasterKey: true}));
+            return Parse.Promise.when(query.find(MasterKey), query.count(MasterKey));
         })
         .then((users, total) =>res.success({
             users: users,
@@ -722,7 +723,7 @@ function listUsers(req, res, next) {
         .notContainedIn('objectId', [req.user.id])
         .limit(_limit)
         .skip((_page * _limit) - _limit)
-        .find({useMasterKey: true})
+        .find(MasterKey)
         .then(data=> {
 
             console.log('users', data);
@@ -740,7 +741,7 @@ function listUsers(req, res, next) {
             _.each(data, user=> {
 
                 // User Data
-                new Parse.Query('UserData').equalTo('user', user).first({useMasterKey: true}).then(userData=> {
+                new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(userData=> {
 
                     // Follow
                     new Parse.Query(UserFollow)
@@ -798,7 +799,7 @@ function updateUser(req, res, next) {
 
         return new Parse.Query(Parse.User)
             .equalTo('objectId', data.id)
-            .first({useMasterKey: true});
+            .first(MasterKey);
     }).then(objUser => {
 
         objUser.set('name', data.name);
@@ -815,7 +816,7 @@ function updateUser(req, res, next) {
             objUser.set('password', data.password);
         }
 
-        return objUser.save(null, {useMasterKey: true});
+        return objUser.save(null, MasterKey);
     }).then(success=>res.success(success), error=> res.error(error.message));
 }
 
@@ -834,14 +835,14 @@ function destroyUser(req, res, next) {
 
         return new Parse.Query(Parse.User)
             .equalTo('objectId', params.id)
-            .first({useMasterKey: true});
+            .first(MasterKey);
     }).then(objUser=> {
 
         if (!objUser) {
             return res.error('User not found');
         }
 
-        return objUser.destroy({useMasterKey: true});
+        return objUser.destroy(MasterKey);
     }).then(success=>res.success(success), error=> res.error(error.message));
 }
 
@@ -877,7 +878,7 @@ function saveFacebookPicture(req, res, next) {
 function validateUsername(req, res) {
     new Parse.Query(Parse.User)
         .equalTo('username', req.params.username)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(count=> {
             console.log('validateUsername', count);
             if (count) {
@@ -891,7 +892,7 @@ function validateUsername(req, res) {
 function validateEmail(req, res) {
     new Parse.Query(Parse.User)
         .equalTo('email', req.params.email)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(count=> {
             console.log('validateEmail', count);
             if (count) {
@@ -905,65 +906,61 @@ function validateEmail(req, res) {
 
 // Album Gallery
 function incrementAlbumGallery(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('albumTotal').save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('albumTotal').save(null, MasterKey)
     });
 }
 
 function decrementAlbumGallery(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('albumTotal', 1).save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('albumTotal', 1).save(null, MasterKey)
     });
 }
 
 // Gallery
 function incrementGallery(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('galleriesTotal').save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('galleriesTotal').save(null, MasterKey)
     });
 }
 
 function decrementGallery(user) {
     return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('galleriesTotal', -1).save(null, {useMasterKey: true})
+        return user.increment('galleriesTotal', -1).save(null, MasterKey)
     });
 }
 
-//seguidoes
+//seguidores
 function incrementFollowers(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('followersTotal').save(null, {useMasterKey: true});
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('followersTotal').save(null, MasterKey);
+    });
+}
+function decrementFollowers(user) {
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('followersTotal', -1).save(null, MasterKey);
     });
 }
 //seguindo
 function incrementFollowing(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('followingsTotal').save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('followingsTotal').save(null, MasterKey)
     });
 }
-
-//seguidoes
-function decrementFollowers(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('followersTotal', -1).save(null, {useMasterKey: true});
-    });
-}
-//seguindo
 function decrementFollowing(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('followingsTotal', -1)
-        user.save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('followingsTotal', -1).save(null, MasterKey)
     });
 }
-
+// comment
 function incrementComment(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('commentsTotal').save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('commentsTotal').save(null, MasterKey)
     });
 }
 
 function decrementComment(user) {
-    return new Parse.Query('UserData').equalTo('user', user).first().then(user => {
-        return user.increment('commentsTotal', 1).save(null, {useMasterKey: true})
+    return new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(user => {
+        return user.increment('commentsTotal', 1).save(null, MasterKey)
     });
 }
