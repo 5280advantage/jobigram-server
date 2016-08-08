@@ -3,6 +3,9 @@ const Image = require('../helpers/image');
 const User = require('./../class/User');
 const GalleryActivity = require('./../class/GalleryActivity');
 const ParseObject = Parse.Object.extend('GalleryComment');
+const MasterKey       = {useMasterKey: true};
+
+
 module.exports = {
     beforeSave: beforeSave,
     afterSave: afterSave
@@ -39,7 +42,7 @@ function afterSave(req, res) {
     }
     new Parse.Query('Gallery')
         .equalTo('objectId', comment.get('gallery').id)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(gallery => {
 
             let activity = {

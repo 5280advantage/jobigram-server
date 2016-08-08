@@ -3,6 +3,7 @@ const _           = require('lodash');
 const User        = require('./../class/User');
 const ParseObject = Parse.Object.extend('GalleryActivity');
 const UserFollow  = Parse.Object.extend('UserFollow');
+const MasterKey       = {useMasterKey: true};
 
 module.exports = {
     afterSave: afterSave,

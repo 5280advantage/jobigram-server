@@ -1,6 +1,8 @@
 'use strict';
 const _           = require('lodash');
 const ParseObject = Parse.Object.extend('GallerySetting');
+const MasterKey       = {useMasterKey: true};
+
 module.exports    = {
     start : start,
     create: create

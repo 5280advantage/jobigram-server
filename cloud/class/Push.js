@@ -1,4 +1,6 @@
 'use strict';
+const MasterKey = {useMasterKey: true};
+
 module.exports = {
     verifyServerConnection: verifyServerConnection,
     pushText              : pushText,
@@ -42,7 +44,7 @@ function _sendPushToAll(data, res, delayMs) {
         Parse.Push.send({
             where: query,
             data : data,
-        }, {useMasterKey: true})
+        }, MasterKey)
              .then(function () {
                  console.log('push sent. args received: ' + JSON.stringify(arguments) + '\n');
                  res.success({

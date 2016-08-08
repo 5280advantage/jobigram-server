@@ -1,5 +1,6 @@
 'use strict';
 const GallerySetting = require('../class/GallerySetting');
+const MasterKey       = {useMasterKey: true};
 
 module.exports = {
     status: status,
@@ -10,7 +11,7 @@ function status(req, res, next) {
     console.log(req.params);
     new Parse.Query(Parse.Role)
         .equalTo('name', 'Admin')
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(adminRole=> {
 
             console.log(adminRole);
@@ -19,7 +20,7 @@ function status(req, res, next) {
             }
 
             let userRelation = adminRole.relation('users');
-            return userRelation.query().count({useMasterKey: true});
+            return userRelation.query().count(MasterKey);
         })
         .then(count=> {
             if (count > 0) {
@@ -87,12 +88,12 @@ function start(req, res, next) {
 
     new Parse.Query(Parse.Role)
         .find()
-        .then(objRoles => Parse.Object.destroyAll(objRoles, {useMasterKey: true}))
+        .then(objRoles => Parse.Object.destroyAll(objRoles, MasterKey))
         .then(() => Parse.Object.saveAll(roles))
         .then(() => user.signUp())
         .then(objUser=> {
             objUser.setACL(new Parse.ACL(objUser));
-            objUser.save(null, {useMasterKey: true});
+            objUser.save(null, MasterKey);
 
             // Create Settings
             GallerySetting
