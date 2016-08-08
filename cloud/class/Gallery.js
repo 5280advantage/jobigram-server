@@ -6,6 +6,7 @@ const GalleryActivity = require('./../class/GalleryActivity');
 const ParseObject     = Parse.Object.extend('Gallery');
 const GalleryAlbum    = Parse.Object.extend('GalleryAlbum');
 const UserFollow      = Parse.Object.extend('UserFollow');
+const MasterKey       = {useMasterKey: true};
 
 module.exports = {
     beforeSave    : beforeSave,
@@ -112,8 +113,8 @@ function afterDelete(req, res) {
     });
 
     let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id)
-                                                        .first({useMasterKey: true}).then(galleryAlbum=> {
-            return galleryAlbum.increment('qtyPhotos', -1).save(null, {useMasterKey: true})
+                                                        .first(MasterKey).then(galleryAlbum=> {
+            return galleryAlbum.increment('qtyPhotos', -1).save(null, MasterKey)
         });
 
     Parse.Promise.when([
@@ -140,7 +141,7 @@ function afterSave(req) {
         album.set('image', req.object.attributes.image);
         album.set('imageThumb', req.object.attributes.imageThumb);
         album.increment('qtyPhotos', 1);
-        album.save(null, {useMasterKey: true});
+        album.save(null, MasterKey);
     });
 
     // Activity
@@ -169,7 +170,7 @@ function commentGallery(req, res) {
                 .equalTo('gallery', gallery)
                 .limit(_limit)
                 .skip((_page * _limit) - _limit)
-                .find({useMasterKey: true})
+                .find(MasterKey)
                 .then(data=> {
                     let _result = [];
 
@@ -247,7 +248,7 @@ function search(req, res, next) {
         .descending('createdAt')
         .limit(_limit)
         .skip((_page * _limit) - _limit)
-        .find({useMasterKey: true})
+        .find(MasterKey)
         .then(data => {
             let _result = [];
 
@@ -341,7 +342,7 @@ function getAlbum(req, res) {
 
             new Parse.Query(ParseObject)
                 .equalTo('album', album)
-                .find({useMasterKey: true})
+                .find(MasterKey)
                 .then(photos=> {
                     let result = {
                         album : album,
@@ -377,7 +378,7 @@ function feed(req, res, next) {
     if (params.username) {
         new Parse.Query(Parse.User)
             .equalTo('username', params.username)
-            .first({useMasterKey: true})
+            .first(MasterKey)
             .then(user=> {
                 _query.equalTo('user', user);
                 runQuery();
@@ -388,7 +389,7 @@ function feed(req, res, next) {
         new Parse.Query(UserFollow)
             .equalTo('from', req.user)
             .include('user')
-            .find({useMasterKey: true})
+            .find(MasterKey)
             .then(users=> {
                 following = _.map(users, userFollow=> {
                     return userFollow.get('to');
@@ -412,7 +413,7 @@ function feed(req, res, next) {
             .skip((_page * _limit) - _limit)
             .containedIn('user', following)
             .include('album')
-            .find({useMasterKey: true})
+            .find(MasterKey)
             .then(data=> {
                 let _result = [];
 
@@ -428,7 +429,7 @@ function feed(req, res, next) {
 
                     // User Data
                     let userGet = itemGallery.get('user');
-                    new Parse.Query('UserData').equalTo('user', userGet).first({useMasterKey: true}).then(user=> {
+                    new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(user=> {
 
                         let obj = {
                             id           : itemGallery.id,
@@ -457,7 +458,7 @@ function feed(req, res, next) {
                         new Parse.Query('Gallery')
                             .equalTo('likes', req.user)
                             .equalTo('objectId', itemGallery.id)
-                            .first({useMasterKey: true})
+                            .first(MasterKey)
                             .then(liked=> {
                                 obj.isLiked = liked ? true : false;
 
@@ -465,7 +466,7 @@ function feed(req, res, next) {
                                 new Parse.Query('GalleryComment')
                                     .equalTo('gallery', itemGallery)
                                     .limit(3)
-                                    .find({useMasterKey: true})
+                                    .find(MasterKey)
                                     .then(comments=> {
                                         comments.map(function (comment) {
                                             obj.comments.push({
@@ -540,7 +541,7 @@ function likeGallery(req, res, next) {
 
         console.log('step4', activity);
 
-        return objParse.save(null, {useMasterKey: true});
+        return objParse.save(null, MasterKey);
 
     }).then(data => {
         GalleryActivity.create(activity);
@@ -559,7 +560,7 @@ function isGalleryLiked(req, res, next) {
     new Parse.Query('Gallery')
         .equalTo('likes', user)
         .equalTo('objectId', galleryId)
-        .first({useMasterKey: true})
+        .first(MasterKey)
         .then(gallery=>res.success(gallery ? true : false), error=> res.error(error.message));
 }
 

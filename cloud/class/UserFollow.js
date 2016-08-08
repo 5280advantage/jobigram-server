@@ -1,5 +1,7 @@
 'use strict';
 const ParseObject     = Parse.Object.extend('UserFollow');
+const MasterKey       = {useMasterKey: true};
+
 module.exports = {
     beforeSave: beforeSave,
     create    : create
