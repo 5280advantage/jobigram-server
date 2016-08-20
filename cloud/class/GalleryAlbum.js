@@ -4,6 +4,7 @@ const Image           = require('./../helpers/image');
 const User            = require('./../class/User');
 const GalleryActivity = require('./../class/GalleryActivity');
 const ParseObject     = Parse.Object.extend('GalleryAlbum');
+const MasterKey       = {useMasterKey: true};
 
 
 module.exports = {
