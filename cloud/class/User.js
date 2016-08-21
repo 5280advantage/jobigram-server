@@ -674,14 +674,14 @@ function getUsers(req, res, next) {
     new Parse.Query(Parse.Role)
         .equalTo('name', 'Admin')
         .equalTo('users', user)
-        .first()
+        .first(MasterKey)
         .then(adminRole => {
 
             if (!adminRole) {
                 return res.error('Not Authorized');
             }
 
-            const query = new Parse.Query(Parse.User);
+            let query = new Parse.Query(UserData);
 
             if (params.filter != '') {
                 query.contains('email', params.filter);
