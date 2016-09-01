@@ -1,19 +1,19 @@
 'use strict';
-const Image = require('../helpers/image');
-const User = require('./../class/User');
+const Image           = require('../helpers/image');
+const User            = require('./../class/User');
 const GalleryActivity = require('./../class/GalleryActivity');
-const ParseObject = Parse.Object.extend('GalleryComment');
+const ParseObject     = Parse.Object.extend('GalleryComment');
 const MasterKey       = {useMasterKey: true};
 
 
 module.exports = {
     beforeSave: beforeSave,
-    afterSave: afterSave
+    afterSave : afterSave
 };
 
 function beforeSave(req, res) {
     var comment = req.object;
-    var user = req.user;
+    var user    = req.user;
     var gallery = comment.get('gallery');
 
     if (!user) {
@@ -29,9 +29,16 @@ function beforeSave(req, res) {
         acl.setWriteAccess(user, true);
         comment.setACL(acl);
         comment.set('isInappropriate', false);
+
+        new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(profile => {
+            comment.set('profile', profile);
+            return res.success();
+        });
+    } else {
+        return res.success();
     }
 
-    return res.success();
+
 }
 
 function afterSave(req, res) {
@@ -46,11 +53,11 @@ function afterSave(req, res) {
         .then(gallery => {
 
             let activity = {
-                action: 'comment',
+                action  : 'comment',
                 fromUser: req.user,
-                comment: comment,
-                toUser: gallery.attributes.user,
-                gallery: gallery
+                comment : comment,
+                toUser  : gallery.attributes.user,
+                gallery : gallery
             };
 
             return Parse.Promise.when([
