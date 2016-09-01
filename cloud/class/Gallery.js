@@ -182,11 +182,23 @@ function commentGallery(req, res) {
                         res.success(_result);
                     });
 
-                    _.each(data, itemComment=> {
+                    _.each(data, itemComment => {
 
                         // User Data
                         let userGet = itemComment.get('user');
                         new Parse.Query('UserData').equalTo('user', userGet).first().then(user=> {
+
+                            // If not profile create profile
+                            if(!itemComment.get('profile')) {
+                                itemComment.set('profile', user);
+                                itemComment.save();
+                            }
+
+                            // If not profile create profile
+                            if(!gallery.get('profile')) {
+                                gallery.set('profile', user);
+                                gallery.save();
+                            }
 
                             let obj = {
                                 object   : itemComment,
@@ -466,20 +478,23 @@ function feed(req, res, next) {
                                 new Parse.Query('GalleryComment')
                                     .equalTo('gallery', itemGallery)
                                     .limit(3)
+                                    .include('profile')
                                     .find(MasterKey)
-                                    .then(comments=> {
+                                    .then(comments => {
                                         comments.map(function (comment) {
+
+                                            // If not profile create profile
+                                            if(!itemGallery.get('profile')) {
+                                                itemGallery.set('profile', user);
+                                                itemGallery.save();
+                                            }
+
                                             obj.comments.push({
-                                                id  : comment.id,
-                                                obj : comment,
-                                                user: {
-                                                    obj     : itemGallery.get('user'),
-                                                    name    : user.get('name'),
-                                                    username: user.get('username'),
-                                                    status  : user.get('status'),
-                                                    photo   : user.get('photo')
-                                                },
-                                                text: comment.get('text'),
+                                                id     : comment.id,
+                                                obj    : comment,
+                                                profile: comment.get('profile'),
+                                                user   : comment.get('user'),
+                                                text   : comment.get('text'),
                                             })
                                         });
                                         //console.log('itemGallery', itemGallery, user, comments);
