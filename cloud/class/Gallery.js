@@ -482,6 +482,13 @@ function feed(req, res, next) {
                                     .find(MasterKey)
                                     .then(comments => {
                                         comments.map(function (comment) {
+
+                                            // If not profile create profile
+                                            if(!itemGallery.get('profile')) {
+                                                itemGallery.set('profile', user);
+                                                itemGallery.save();
+                                            }
+
                                             obj.comments.push({
                                                 id     : comment.id,
                                                 obj    : comment,
