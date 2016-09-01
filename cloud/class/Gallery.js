@@ -194,6 +194,12 @@ function commentGallery(req, res) {
                                 itemComment.save();
                             }
 
+                            // If not profile create profile
+                            if(!gallery.get('profile')) {
+                                gallery.set('profile', user);
+                                gallery.save();
+                            }
+
                             let obj = {
                                 object   : itemComment,
                                 id       : itemComment.id,
