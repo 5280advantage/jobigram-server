@@ -28,11 +28,6 @@ function beforeSave(req, res) {
         comment.setACL(acl);
         comment.set('isInappropriate', false);
 
-        // Relation
-        let relation = gallery.relation('comments');
-        relation.add(req.object);
-        gallery.save();
-
         new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(profile => {
 
             comment.set('user', user);
@@ -55,6 +50,11 @@ function afterSave(req, res) {
         .equalTo('objectId', comment.get('gallery').id)
         .first(MasterKey)
         .then(gallery => {
+
+            // Relation
+            let relation = gallery.relation('comments');
+            relation.add(req.object);
+            gallery.save();
 
             let activity = {
                 action  : 'comment',
