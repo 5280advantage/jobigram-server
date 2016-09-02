@@ -12,15 +12,13 @@ module.exports = {
 };
 
 function beforeSave(req, res) {
-    var comment = req.object;
-    var user    = req.user;
-    var gallery = comment.get('gallery');
+    const comment = req.object;
+    const user    = req.user;
+    const gallery = comment.get('gallery');
 
     if (!user) {
         return res.error('Not Authorized');
     }
-
-    comment.set('user', user);
 
     if (!comment.existed()) {
         var acl = new Parse.ACL();
@@ -31,13 +29,14 @@ function beforeSave(req, res) {
         comment.set('isInappropriate', false);
 
         new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(profile => {
+
+            comment.set('user', user);
             comment.set('profile', profile);
             return res.success();
         });
     } else {
         return res.success();
     }
-
 
 }
 
@@ -51,6 +50,11 @@ function afterSave(req, res) {
         .equalTo('objectId', comment.get('gallery').id)
         .first(MasterKey)
         .then(gallery => {
+
+            // Relation
+            let relation = gallery.relation('comments');
+            relation.add(req.object);
+            gallery.save();
 
             let activity = {
                 action  : 'comment',

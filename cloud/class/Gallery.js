@@ -46,49 +46,57 @@ function beforeSave(req, res) {
     if (!gallery.dirty('image')) {
         return res.success();
     }
-    // Like
 
+    // Search Gallery
     //https://parse.com/docs/js/guide#performance-implement-efficient-searches
     let toLowerCase = w => w.toLowerCase();
     var words       = gallery.get('title').split(/\b/);
     words           = _.map(words, toLowerCase);
     var stopWords   = ['the', 'in', 'and']
-    words           = _.filter(words, w=> w.match(/^\w+$/) && !_.includes(stopWords, w));
+    words           = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
     var hashtags    = gallery.get('title').match(/#.+?\b/g);
     hashtags        = _.map(hashtags, toLowerCase)
 
     gallery.set('words', words);
     gallery.set('hashtags', hashtags);
 
-    // Set default values
-    gallery.set('user', user);
-    gallery.set('isApproved', true);
-
-    gallery.increment('followersTotal', 0);
-    gallery.increment('followingsTotal', 0);
-    gallery.increment('likesTotal', 0);
-    gallery.increment('galleriesTotal', 0);
-    gallery.increment('commentsTotal', 0);
-
     // Resize Image
-    var imageUrl = gallery.get('image').url();
+    if (!gallery.existed()) {
+        let imageUrl = gallery.get('image').url();
+        console.log('Resize image', imageUrl);
+        Image.resize(imageUrl, 640, 640).then(base64 => {
+            return Image.saveImage(base64);
+        }).then(savedFile => {
+            gallery.set('image', savedFile);
+            return Image.resize(imageUrl, 160, 160);
+        }).then(base64 => {
+            return Image.saveImage(base64);
+        }).then(savedFile => {
+            gallery.set('imageThumb', savedFile);
 
-    console.log('Resize image', imageUrl);
-    Image.resize(imageUrl, 640, 640).then(base64=> {
-        return Image.saveImage(base64);
-    }).then(savedFile=> {
-        gallery.set('image', savedFile);
-        return Image.resize(imageUrl, 160, 160);
-    }).then(base64=> {
-        return Image.saveImage(base64);
-    }).then(savedFile => {
-        gallery.set('imageThumb', savedFile);
+            gallery.increment('followersTotal', 0);
+            gallery.increment('followingsTotal', 0);
+            gallery.increment('likesTotal', 0);
+            gallery.increment('galleriesTotal', 0);
+            gallery.increment('commentsTotal', 0);
+
+            new Parse.Query('UserData').equalTo('user', user).first(MasterKey).then(profile => {
+
+                // Set default values
+                gallery.set('user', user);
+                gallery.set('isApproved', true);
+                gallery.set('profile', profile);
+                return res.success();
+            });
+
+        }, res.error);
+    } else {
         res.success();
-    }, res.error);
+    }
 }
 
 function afterDelete(req, res) {
-    let deleteComments = new Parse.Query('GalleryComment').equalTo('gallery', req.object).find().then(results=> {
+    let deleteComments = new Parse.Query('GalleryComment').equalTo('gallery', req.object).find().then(results => {
         // Collect one promise for each delete into an array.
         let promises = [];
         _.each(results, result => {
@@ -100,7 +108,7 @@ function afterDelete(req, res) {
 
     });
 
-    let deleteActivity = new Parse.Query('GalleryActivity').equalTo('gallery', req.object).find().then(results=> {
+    let deleteActivity = new Parse.Query('GalleryActivity').equalTo('gallery', req.object).find().then(results => {
         // Collect one promise for each delete into an array.
         let promises = [];
         _.each(results, result => {
@@ -113,7 +121,7 @@ function afterDelete(req, res) {
     });
 
     let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id)
-                                                        .first(MasterKey).then(galleryAlbum=> {
+                                                        .first(MasterKey).then(galleryAlbum => {
             return galleryAlbum.increment('qtyPhotos', -1).save(null, MasterKey)
         });
 
@@ -164,21 +172,21 @@ function commentGallery(req, res) {
     new Parse.Query(ParseObject)
         .equalTo('objectId', params.galleryId)
         .first()
-        .then(gallery=> {
+        .then(gallery => {
 
             new Parse.Query('GalleryComment')
                 .equalTo('gallery', gallery)
                 .limit(_limit)
                 .skip((_page * _limit) - _limit)
                 .find(MasterKey)
-                .then(data=> {
+                .then(data => {
                     let _result = [];
 
                     if (!data.length) {
                         res.success(_result);
                     }
 
-                    let cb = _.after(data.length, ()=> {
+                    let cb = _.after(data.length, () => {
                         res.success(_result);
                     });
 
@@ -186,16 +194,16 @@ function commentGallery(req, res) {
 
                         // User Data
                         let userGet = itemComment.get('user');
-                        new Parse.Query('UserData').equalTo('user', userGet).first().then(user=> {
+                        new Parse.Query('UserData').equalTo('user', userGet).first().then(user => {
 
                             // If not profile create profile
-                            if(!itemComment.get('profile')) {
+                            if (!itemComment.get('profile')) {
                                 itemComment.set('profile', user);
                                 itemComment.save();
                             }
 
                             // If not profile create profile
-                            if(!gallery.get('profile')) {
+                            if (!gallery.get('profile')) {
                                 gallery.set('profile', user);
                                 gallery.save();
                             }
@@ -217,9 +225,9 @@ function commentGallery(req, res) {
 
                             _result.push(obj);
                             cb();
-                        }, err=>console.log);
+                        }, err => console.log);
                     });
-                }, error=> res.error(error.message))
+                }, error => res.error(error.message))
         })
     ;
 }
@@ -350,12 +358,12 @@ function getAlbum(req, res) {
     const params = req.params;
     new Parse.Query(GalleryAlbum)
         .get(params.id)
-        .then(album=> {
+        .then(album => {
 
             new Parse.Query(ParseObject)
                 .equalTo('album', album)
                 .find(MasterKey)
-                .then(photos=> {
+                .then(photos => {
                     let result = {
                         album : album,
                         photos: photos
@@ -391,10 +399,10 @@ function feed(req, res, next) {
         new Parse.Query(Parse.User)
             .equalTo('username', params.username)
             .first(MasterKey)
-            .then(user=> {
+            .then(user => {
                 _query.equalTo('user', user);
                 runQuery();
-            }, error=> {
+            }, error => {
                 runQuery();
             });
     } else {
@@ -402,8 +410,8 @@ function feed(req, res, next) {
             .equalTo('from', req.user)
             .include('user')
             .find(MasterKey)
-            .then(users=> {
-                following = _.map(users, userFollow=> {
+            .then(users => {
+                following = _.map(users, userFollow => {
                     return userFollow.get('to');
                 });
 
@@ -426,22 +434,22 @@ function feed(req, res, next) {
             .containedIn('user', following)
             .include('album')
             .find(MasterKey)
-            .then(data=> {
+            .then(data => {
                 let _result = [];
 
                 if (!data.length) {
                     res.success(_result);
                 }
 
-                let cb = _.after(data.length, ()=> {
+                let cb = _.after(data.length, () => {
                     res.success(_result);
                 });
 
-                _.each(data, itemGallery=> {
+                _.each(data, itemGallery => {
 
                     // User Data
                     let userGet = itemGallery.get('user');
-                    new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(user=> {
+                    new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(user => {
 
                         let obj = {
                             id           : itemGallery.id,
@@ -471,7 +479,7 @@ function feed(req, res, next) {
                             .equalTo('likes', req.user)
                             .equalTo('objectId', itemGallery.id)
                             .first(MasterKey)
-                            .then(liked=> {
+                            .then(liked => {
                                 obj.isLiked = liked ? true : false;
 
                                 // Comments
@@ -484,7 +492,7 @@ function feed(req, res, next) {
                                         comments.map(function (comment) {
 
                                             // If not profile create profile
-                                            if(!itemGallery.get('profile')) {
+                                            if (!itemGallery.get('profile')) {
                                                 itemGallery.set('profile', user);
                                                 itemGallery.save();
                                             }
@@ -502,11 +510,11 @@ function feed(req, res, next) {
                                         _result.push(obj);
                                         cb();
 
-                                    }, error=> res.error(error.message));
-                            }, error=> res.error(error.message));
-                    }, err=>console.log);
+                                    }, error => res.error(error.message));
+                            }, error => res.error(error.message));
+                    }, err => console.log);
                 });
-            }, error=> res.error(error.message))
+            }, error => res.error(error.message))
     }
 }
 
@@ -561,7 +569,7 @@ function likeGallery(req, res, next) {
     }).then(data => {
         GalleryActivity.create(activity);
         res.success(response);
-    }, error=> res.error);
+    }, error => res.error);
 }
 
 function isGalleryLiked(req, res, next) {
@@ -576,6 +584,6 @@ function isGalleryLiked(req, res, next) {
         .equalTo('likes', user)
         .equalTo('objectId', galleryId)
         .first(MasterKey)
-        .then(gallery=>res.success(gallery ? true : false), error=> res.error(error.message));
+        .then(gallery => res.success(gallery ? true : false), error => res.error(error.message));
 }
 
