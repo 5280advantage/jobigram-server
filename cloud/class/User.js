@@ -669,8 +669,8 @@ function findUserByEmail(req, res, next) {
 }
 
 function getUsers(req, res, next) {
-    var params = req.params;
-    var user   = req.user;
+    const params = req.params;
+    const user   = req.user;
     new Parse.Query(Parse.Role)
         .equalTo('name', 'Admin')
         .equalTo('users', user)
@@ -681,7 +681,7 @@ function getUsers(req, res, next) {
                 return res.error('Not Authorized');
             }
 
-            let query = new Parse.Query(UserData);
+            const query = new Parse.Query(Parse.User);
 
             if (params.filter != '') {
                 query.contains('email', params.filter);
