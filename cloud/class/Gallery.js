@@ -415,7 +415,9 @@ function feed(req, res, next) {
                         return userFollow.get('to');
                     });
                     following.push(req.user);
+
                     _query.containedIn('user', following)
+                    _query.equalTo('privacity', 'follow');
                     console.log(following);
                     runQuery();
                 }, res.error);
