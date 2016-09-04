@@ -393,35 +393,49 @@ function feed(req, res, next) {
         _query.equalTo('objectId', params.id);
     }
 
-    let following = [];
-
     if (params.username) {
         new Parse.Query(Parse.User)
             .equalTo('username', params.username)
             .first(MasterKey)
             .then(user => {
                 _query.equalTo('user', user);
+                _query.containedIn('privacity', ['', null, undefined, 'public']);
                 runQuery();
             }, error => {
                 runQuery();
             });
     } else {
-        new Parse.Query(UserFollow)
-            .equalTo('from', req.user)
-            .include('user')
-            .find(MasterKey)
-            .then(users => {
-                following = _.map(users, userFollow => {
-                    return userFollow.get('to');
-                });
+        // Follow
+        if (params.privacity === 'follow') {
+            new Parse.Query(UserFollow)
+                .equalTo('from', req.user)
+                .include('user')
+                .find(MasterKey)
+                .then(users => {
+                    let following = _.map(users, userFollow => {
+                        return userFollow.get('to');
+                    });
+                    following.push(req.user);
 
-                following.push(req.user);
+                    _query.containedIn('user', following)
+                    _query.containedIn('privacity', ['', null, undefined, 'public', 'follow']);
+                    console.log(following);
+                    runQuery();
+                }, res.error);
+        }
 
-                console.log(following);
-                runQuery();
+        // Me
+        if (params.privacity === 'me') {
+            _query.containedIn('user', [req.user])
+            runQuery();
+        }
 
+        // Public
+        if (!params.privacity || params.privacity === 'public') {
+            _query.containedIn('privacity', ['', null, undefined, 'public']);
+            runQuery();
+        }
 
-            }, res.error);
     }
 
 
@@ -431,7 +445,6 @@ function feed(req, res, next) {
             .descending('createdAt')
             .limit(_limit)
             .skip((_page * _limit) - _limit)
-            .containedIn('user', following)
             .include('album')
             .find(MasterKey)
             .then(data => {
@@ -448,7 +461,7 @@ function feed(req, res, next) {
                 _.each(data, itemGallery => {
 
                     // User Data
-                    let userGet = itemGallery.get('user');
+                    const userGet = itemGallery.get('user');
                     new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(user => {
 
                         let obj = {
@@ -464,13 +477,7 @@ function feed(req, res, next) {
                             commentsTotal: itemGallery.get('commentsTotal') || 0,
                             likesTotal   : itemGallery.get('likesTotal') || 0,
                             isApproved   : itemGallery.get('isApproved'),
-                            user         : {
-                                obj     : itemGallery.get('user'),
-                                name    : user.get('name'),
-                                username: user.get('username'),
-                                status  : user.get('status'),
-                                photo   : user.get('photo')
-                            }
+                            user         : itemGallery.get('user')
                         };
                         //console.log('Obj', obj);
 
@@ -486,23 +493,14 @@ function feed(req, res, next) {
                                 new Parse.Query('GalleryComment')
                                     .equalTo('gallery', itemGallery)
                                     .limit(3)
-                                    .include('profile')
                                     .find(MasterKey)
                                     .then(comments => {
                                         comments.map(function (comment) {
-
-                                            // If not profile create profile
-                                            if (!itemGallery.get('profile')) {
-                                                itemGallery.set('profile', user);
-                                                itemGallery.save();
-                                            }
-
                                             obj.comments.push({
-                                                id     : comment.id,
-                                                obj    : comment,
-                                                profile: comment.get('profile'),
-                                                user   : comment.get('user'),
-                                                text   : comment.get('text'),
+                                                id  : comment.id,
+                                                obj : comment,
+                                                user: itemGallery.get('user'),
+                                                text: comment.get('text'),
                                             })
                                         });
                                         //console.log('itemGallery', itemGallery, user, comments);
@@ -517,7 +515,6 @@ function feed(req, res, next) {
             }, error => res.error(error.message))
     }
 }
-
 
 function likeGallery(req, res, next) {
     const user      = req.user;
