@@ -425,7 +425,7 @@ function feed(req, res, next) {
 
         // Public
         if (params.privacity === 'public') {
-            _query.equalTo('privacity', 'public');
+            _query.containedIn('privacity', ['', 'public']);
             runQuery();
         }
 
