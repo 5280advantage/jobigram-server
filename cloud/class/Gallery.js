@@ -435,7 +435,7 @@ function feed(req, res, next) {
             _query.containedIn('privacity', ['', null, undefined, 'public']);
             runQuery();
         }
-        
+
     }
 
 
