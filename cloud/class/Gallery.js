@@ -414,7 +414,7 @@ function feed(req, res, next) {
                     let following = _.map(users, userFollow => {
                         return userFollow.get('to');
                     });
-                    //following.push(req.user);
+                    following.push(req.user);
                     _query.containedIn('user', following)
                     console.log(following);
                     runQuery();
@@ -428,7 +428,7 @@ function feed(req, res, next) {
         }
 
         // My
-        if (params.privacity === 'my') {
+        if (params.privacity === 'me') {
             _query.containedIn('user', [req.user])
             runQuery();
         }
