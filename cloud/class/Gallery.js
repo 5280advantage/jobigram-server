@@ -399,6 +399,7 @@ function feed(req, res, next) {
             .first(MasterKey)
             .then(user => {
                 _query.equalTo('user', user);
+                _query.containedIn('privacity', ['', null, undefined, 'public']);
                 runQuery();
             }, error => {
                 runQuery();
@@ -417,25 +418,24 @@ function feed(req, res, next) {
                     following.push(req.user);
 
                     _query.containedIn('user', following)
-                    _query.containedIn('privacity', ['', 'public', 'follow']);
+                    _query.containedIn('privacity', ['', null, undefined, 'public', 'follow']);
                     console.log(following);
                     runQuery();
                 }, res.error);
         }
 
-        // Public
-        if (params.privacity === 'public') {
-            _query.containedIn('privacity', ['', null, undefined, 'public']);
-            runQuery();
-        }
-
-        // My
+        // Me
         if (params.privacity === 'me') {
             _query.containedIn('user', [req.user])
             runQuery();
         }
 
-
+        // Public
+        if (!params.privacity || params.privacity === 'public') {
+            _query.containedIn('privacity', ['', null, undefined, 'public']);
+            runQuery();
+        }
+        
     }
 
 
