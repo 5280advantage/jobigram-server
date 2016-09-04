@@ -417,7 +417,7 @@ function feed(req, res, next) {
                     following.push(req.user);
 
                     _query.containedIn('user', following)
-                    _query.containedIn('privacity', ['public', 'follow']);
+                    _query.containedIn('privacity', ['', 'public', 'follow']);
                     console.log(following);
                     runQuery();
                 }, res.error);
