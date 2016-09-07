@@ -120,16 +120,20 @@ function afterDelete(req, res) {
 
     });
 
-    let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id)
-                                                        .first(MasterKey).then(galleryAlbum => {
-            return galleryAlbum.increment('qtyPhotos', -1).save(null, MasterKey)
-        });
-
-    Parse.Promise.when([
+    let promises = [
         deleteActivity,
-        deleteComments,
-        decrementAlbum
-    ]).then(res.success, res.error);
+        deleteComments
+    ];
+
+    if (req.object.album) {
+        let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id)
+                                                            .first(MasterKey).then(galleryAlbum => {
+                return galleryAlbum.increment('qtyPhotos', -1).save(null, MasterKey)
+            });
+        promises.push(decrementAlbum);
+    }
+
+    Parse.Promise.when(promises).then(res.success, res.error);
 
 
 }
