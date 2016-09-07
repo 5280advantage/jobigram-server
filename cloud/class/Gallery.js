@@ -142,8 +142,8 @@ function afterSave(req) {
     }
 
     // Add Album Relation
-    let _albumId = req.object.attributes.album.id;
-    if(_albumId) {
+    if (req.object.attributes.album) {
+        let _albumId = req.object.attributes.album.id;
         new Parse.Query('GalleryAlbum').get(_albumId).then(album => {
             let relation = album.relation('photos');
             relation.add(req.object);
