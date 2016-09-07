@@ -65,6 +65,3 @@ Parse.Cloud.define('isGalleryLiked', Gallery.isGalleryLiked);
 // GalleryComment
 Parse.Cloud.beforeSave('GalleryComment', GalleryComment.beforeSave);
 Parse.Cloud.afterSave('GalleryComment', GalleryComment.afterSave);
-
-
-
