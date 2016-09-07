@@ -143,14 +143,16 @@ function afterSave(req) {
 
     // Add Album Relation
     let _albumId = req.object.attributes.album.id;
-    new Parse.Query('GalleryAlbum').get(_albumId).then(album => {
-        let relation = album.relation('photos');
-        relation.add(req.object);
-        album.set('image', req.object.attributes.image);
-        album.set('imageThumb', req.object.attributes.imageThumb);
-        album.increment('qtyPhotos', 1);
-        album.save(null, MasterKey);
-    });
+    if(_albumId) {
+        new Parse.Query('GalleryAlbum').get(_albumId).then(album => {
+            let relation = album.relation('photos');
+            relation.add(req.object);
+            album.set('image', req.object.attributes.image);
+            album.set('imageThumb', req.object.attributes.imageThumb);
+            album.increment('qtyPhotos', 1);
+            album.save(null, MasterKey);
+        });
+    }
 
     // Activity
     let activity = {
