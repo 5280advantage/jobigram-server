@@ -15,10 +15,12 @@
         "PARSE_MOUNT": "/parse",
         // (required) - The connection string for your database, i.e. mongodb://user:pass@host.com/dbname.
         // Be sure to URL encode your password if your password has special characters.
+        // "DATABASE_URI": "mongodb://parse:Kemera03095@localhost:27017/photogram",
         "DATABASE_URI": "mongodb://localhost:27017/photogram",
         // URL to your Parse Server (don't forget to specify http:// or https://).
         // This URL will be used when making requests to Parse Server from Cloud Code.
         "SERVER_URL": "http://localhost:1337/parse",
+//        "SERVER_URL": "https://photogramapp.com/parse",
         // Your apps name. This will appear in the subject and body of the emails that are sent.
         "APP_NAME": "Photogram",
         // (required) - The application id to host with this server instance.
@@ -30,8 +32,8 @@
         "MASTER_REST_KEY": "MPhotogramMasterKey",
         // Parse Dashboard
         "DASHBOARD_URL": "/dashboard",
-        "DASHBOARD_USER": "admin",
-        "DASHBOARD_PASSWORD": "admin123",
+        "DASHBOARD_USER": "movibe",
+        "DASHBOARD_PASSWORD": "kemera@02010",
         // (optional) - S3 for Storage Files
         // Files are hosted via automaticamentes GridStore Adapter in MongoDB
         // If you want to host the files on S3 fill in the form below
@@ -40,10 +42,22 @@
         //"BUCKET_NAME": "",
 
         // (optional) - MAILGUN for send Email
-        // "MAILGUN_API_KEY": "",
-        // "MAILGUN_DOMAIN": "",
-        // "MAILGUN_FROM_ADDRESS": ""
+        "MAILGUN_API_KEY": "key-3a05e956706a4bd579982460b96cf43a",
+        "MAILGUN_DOMAIN": "codevibe.io",
+        "MAILGUN_FROM_ADDRESS": "photogram.ionic@gmail.com",
 
+        // Push Notification
+        "PUSH": {
+          "android": {
+            "senderId": "285805785383",
+            "apiKey": "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
+          }
+//          ,"ios": {
+//            "pfx": "./keys/ios_push_certificate.p12",
+//            "bundleId": "com.agenciafoccus.photogram",
+//            "production": false
+//          }
+        }
       }
     }
   ]

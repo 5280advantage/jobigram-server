@@ -2,7 +2,6 @@
 const express        = require('express');
 const cors           = require('cors');
 const ParseServer    = require('parse-server').ParseServer;
-const ParseDashboard = require('parse-dashboard');
 const expressLayouts = require('express-ejs-layouts');
 const path           = require('path');
 const FSFilesAdapter = require('parse-server-fs-adapter');
@@ -10,14 +9,19 @@ const S3Adapter      = require('parse-server').S3Adapter;
 
 // Parse configuration
 const PORT            = process.env.PORT || 1337;
-const DATABASE_URI    = process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://localhost:27017/dev';
+const DATABASE_URI    = process.env.MONGO_URL || process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://localhost:27017/dev';
 const SERVER_URL      = process.env.SERVER_URL || 'http://localhost:1337/parse';
 const APP_ID          = process.env.APP_ID || 'myAppId';
 const MASTER_KEY      = process.env.MASTER_KEY || 'myMasterKey';
 const MASTER_REST_KEY = process.env.MASTER_REST_KEY || 'myRestApiKey';
-const APP_NAME        = process.env.APP_NAME || 'photogram';
+const APP_NAME        = process.env.APP_NAME || 'parseApp';
 const PARSE_MOUNT     = process.env.PARSE_MOUNT || '/parse';
 const CLOUD_CODE_MAIN = process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js';
+const REDIS_URL       = process.env.REDIS_URL;
+
+// Parse Push Android
+let PUSH_ANDROID_SENDER  = process.env.PUSH_ANDROID_SENDER;
+let PUSH_ANDROID_API_KEY = process.env.PUSH_ANDROID_API_KEY;
 
 // Database Ecosystem file
 if (!DATABASE_URI) {
@@ -31,26 +35,34 @@ let ServerConfig = {
     masterKey       : MASTER_KEY,
     serverURL       : SERVER_URL,
     restAPIKey      : MASTER_REST_KEY,
-    verifyUserEmails: false,
     publicServerURL : SERVER_URL,
     appName         : APP_NAME,
-    //liveQuery       : {
-    //    classNames: ['GalleryComment']
-    //},
-    // Ionic Cordova Parse Push Plugin
-    // https://github.com/taivo/parse-push-plugin
-    // Uncomment for Push
-    // push : {
-    //     android: {
-    //         senderId: 'yourSenderId',
-    //         apiKey  : 'yourApiKey'
-    //     },
-    //     ios    : {
-    //         pfx       : 'pfx',
-    //         bundleId  : 'bundleId',
-    //         production: 'production'
-    //     }
-    // }
+    verifyUserEmails: false,
+    // enableAnonymousUsers    : true,
+    // allowClientClassCreation: true,
+    maxUploadSize   : '10mb',
+    liveQuery       : {
+        classNames: ['GalleryActivity', 'Chat'],
+        //redisURL  : REDIS_URL
+    },
+    push            : {
+        ios    : [
+           // {
+           //     pfx       : __dirname + '/keys/ios_dev.p12',
+           //     bundleId  : 'com.agenciafoccus.photogram',
+           //     production: false
+           // },
+           {
+               pfx       : __dirname + '/keys/ios_prod.p12',
+               bundleId  : 'com.agenciafoccus.photogram',
+               production: true
+           }
+        ],
+        android: {
+            senderId: "285805785383",
+            apiKey  : "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
+        }
+    }
 };
 
 
@@ -70,8 +82,9 @@ if (AWS_ACCESS_KEY_ID) {
     ServerConfig.filesAdapter = new S3Adapter(
         AWS_ACCESS_KEY_ID,
         AWS_SECRET_ACCESS_KEY,
-        BUCKET_NAME,
-        {directAccess: true}
+        BUCKET_NAME, {
+            directAccess: true
+        }
     );
 }
 
@@ -84,13 +97,25 @@ if (MAILGUN_API_KEY) {
     ServerConfig.emailAdapter = {
         module : 'parse-server-simple-mailgun-adapter',
         options: {
-            apiKey     : MAILGUN_API_KEY,
-            fromAddress: MAILGUN_DOMAIN,
-            domain     : MAILGUN_FROM_ADDRESS,
+            // The address that your emails come from
+            fromAddress         : MAILGUN_FROM_ADDRESS,
+            // Your domain from mailgun.com
+            domain              : MAILGUN_DOMAIN,
+            // Your API key from mailgun.com
+            apiKey              : MAILGUN_API_KEY,
+            // Verification email subject
+            verificationSubject : 'Please verify your e-mail for %appname%',
+            // Verification email body
+            verificationBody    : 'Hi,\n\nYou are being asked to confirm the e-mail address %email% with %appname%\n\nClick here to confirm it:\n%link%',
+            // Password reset email subject
+            passwordResetSubject: 'Password Reset Request for %appname%',
+            // Password reset email body
+            passwordResetBody   : 'Hi,\n\nYou requested a password reset for %appname%.\n\nClick here to reset it:\n%link%'
         }
     };
 }
 
+console.log(ServerConfig);
 
 // Start Parse Server
 const api = new ParseServer(ServerConfig);
@@ -117,35 +142,6 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => res.render('index'));
-
-
-// Parse Dashboard
-const DASHBOARD_URL      = process.env.DASHBOARD_URL;
-const DASHBOARD_USER     = process.env.DASHBOARD_USER;
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
-if (DASHBOARD_USER) {
-    const dashboard = new ParseDashboard({
-        apps       : [
-            {
-                appName  : APP_NAME,
-                serverURL: SERVER_URL,
-                appId    : APP_ID,
-                masterKey: MASTER_KEY,
-                iconName : 'icon.png'
-            }
-        ],
-        users      : [
-            {
-                user: DASHBOARD_USER, // Used to log in to your Parse Dashboard
-                pass: DASHBOARD_PASSWORD
-            }
-        ],
-        iconsFolder: 'icons'
-    }, true);
-
-    // make the Parse Dashboard available at /dashboard
-    app.use(DASHBOARD_URL, dashboard);
-}
 
 const httpServer = require('http').createServer(app);
 httpServer.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
