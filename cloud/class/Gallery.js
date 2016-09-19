@@ -453,60 +453,60 @@ function feed(req, res, next) {
             .skip((_page * _limit) - _limit)
             .include('album')
             .find(MasterKey)
-            .then(_data => {
+            .then(data => {
                 let _result = [];
 
-                if (!_data.length) {
+                if (!data.length) {
                     res.success(_result);
                 }
 
-                let cb = _.after(_data.length, () => {
+                let cb = _.after(data.length, () => {
                     res.success(_result);
                 });
 
-                _.each(_data, _gallery => {
+                _.each(data, itemGallery => {
 
                     // User Data
-                    const userGet = _gallery.get('user');
-                    new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(_userData => {
+                    const userGet = itemGallery.get('user');
+                    new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(user => {
 
                         let obj = {
-                            id           : _gallery.id,
-                            obj          : _gallery,
+                            id           : itemGallery.id,
+                            obj          : itemGallery,
                             comments     : [],
-                            album        : _gallery.get('album'),
-                            createdAt    : _gallery.get('createdAt'),
-                            image        : _gallery.get('image'),
-                            imageThumb   : _gallery.get('imageThumb'),
-                            location     : _gallery.get('location'),
-                            title        : _gallery.get('title'),
-                            commentsTotal: _gallery.get('commentsTotal') || 0,
-                            likesTotal   : _gallery.get('likesTotal') || 0,
-                            isApproved   : _gallery.get('isApproved'),
-                            user         : _userData
+                            album        : itemGallery.get('album'),
+                            createdAt    : itemGallery.get('createdAt'),
+                            image        : itemGallery.get('image'),
+                            imageThumb   : itemGallery.get('imageThumb'),
+                            location     : itemGallery.get('location'),
+                            title        : itemGallery.get('title'),
+                            commentsTotal: itemGallery.get('commentsTotal') || 0,
+                            likesTotal   : itemGallery.get('likesTotal') || 0,
+                            isApproved   : itemGallery.get('isApproved'),
+                            user         : itemGallery.get('user')
                         };
                         //console.log('Obj', obj);
 
                         // Is Liked
                         new Parse.Query('Gallery')
                             .equalTo('likes', req.user)
-                            .equalTo('objectId', _gallery.id)
+                            .equalTo('objectId', itemGallery.id)
                             .first(MasterKey)
                             .then(liked => {
                                 obj.isLiked = liked ? true : false;
 
                                 // Comments
                                 new Parse.Query('GalleryComment')
-                                    .equalTo('gallery', _gallery)
+                                    .equalTo('gallery', itemGallery)
                                     .limit(3)
                                     .find(MasterKey)
-                                    .then(_comments => {
-                                        _comments.map(function (_comment) {
+                                    .then(comments => {
+                                        comments.map(function (comment) {
                                             obj.comments.push({
-                                                id  : _comment.id,
-                                                obj : _comment,
-                                                user: _gallery.get('user'),
-                                                text: _comment.get('text'),
+                                                id  : comment.id,
+                                                obj : comment,
+                                                user: itemGallery.get('user'),
+                                                text: comment.get('text'),
                                             })
                                         });
                                         //console.log('itemGallery', itemGallery, user, comments);
