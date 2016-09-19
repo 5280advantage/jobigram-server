@@ -483,7 +483,7 @@ function feed(req, res, next) {
                             commentsTotal: itemGallery.get('commentsTotal') || 0,
                             likesTotal   : itemGallery.get('likesTotal') || 0,
                             isApproved   : itemGallery.get('isApproved'),
-                            user         : itemGallery.get('user')
+                            user         : user
                         };
                         //console.log('Obj', obj);
 
