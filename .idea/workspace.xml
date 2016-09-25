@@ -38,8 +38,8 @@
       <file leaf-file-name="Gallery.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cloud/class/Gallery.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="480" column="40" lean-forward="true" selection-start-line="480" selection-start-column="40" selection-end-line="480" selection-end-column="40" />
+            <state relative-caret-position="301">
+              <caret line="472" column="25" lean-forward="false" selection-start-line="472" selection-start-column="25" selection-end-line="472" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -221,12 +221,12 @@
       <workItem from="1470695658948" duration="24000" />
       <workItem from="1474141261392" duration="212000" />
       <workItem from="1474203615264" duration="21000" />
-      <workItem from="1474298382029" duration="264000" />
+      <workItem from="1474298382029" duration="390000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7745000" />
+    <option name="totallyTimeSpent" value="7871000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="6" />
@@ -587,8 +587,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cloud/class/Gallery.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="480" column="40" lean-forward="true" selection-start-line="480" selection-start-column="40" selection-end-line="480" selection-end-column="40" />
+        <state relative-caret-position="301">
+          <caret line="472" column="25" lean-forward="false" selection-start-line="472" selection-start-column="25" selection-end-line="472" selection-end-column="25" />
           <folding />
         </state>
       </provider>
