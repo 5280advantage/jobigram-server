@@ -41,18 +41,23 @@ let ServerConfig = {
     // enableAnonymousUsers    : true,
     // allowClientClassCreation: true,
     maxUploadSize   : '10mb',
-    liveQuery       : {
-        classNames: ['GalleryActivity', 'Chat'],
+    // liveQuery       : {
+    //     classNames: [],
         //redisURL  : REDIS_URL
-    },
-    push            : {
-        android: {
-            senderId: "285805785383",
-            apiKey  : "AIzaSyCBXV7CnhusYV0172lMsvvDy1zHfr96luk"
-        }
-    }
+    // },
 };
 
+// Push Android
+if(PUSH_ANDROID_SENDER) {
+    ServerConfig.push({
+         push: {
+             android: {
+                 senderId: PUSH_ANDROID_SENDER,
+                 apiKey  : PUSH_ANDROID_API_KEY
+             }
+         }
+    })
+}
 
 // File Local
 const UPLOAD_LOCAL_PATH = process.env.UPLOAD_LOCAL_PATH;
@@ -91,19 +96,23 @@ if (MAILGUN_API_KEY) {
             domain              : MAILGUN_DOMAIN,
             // Your API key from mailgun.com
             apiKey              : MAILGUN_API_KEY,
+
             // Verification email subject
-            verificationSubject : 'Please verify your e-mail for %appname%',
+            verificationSubject: 'Please verify your e-mail for %appname%',
             // Verification email body
-            verificationBody    : 'Hi,\n\nYou are being asked to confirm the e-mail address %email% with %appname%\n\nClick here to confirm it:\n%link%',
+            verificationBody: 'Hi,\n\nYou are being asked to confirm the e-mail address %email% with %appname%\n\nClick here to confirm it:\n%link%',
+            //OPTIONAL (will send HTML version of email):
+            verificationBodyHTML: fs.readFileSync("./email/verificationBody.html", "utf8") ||  null,
+
             // Password reset email subject
             passwordResetSubject: 'Password Reset Request for %appname%',
             // Password reset email body
-            passwordResetBody   : 'Hi,\n\nYou requested a password reset for %appname%.\n\nClick here to reset it:\n%link%'
+            passwordResetBody: 'Hi,\n\nYou requested a password reset for %appname%.\n\nClick here to reset it:\n%link%',
+            //OPTIONAL (will send HTML version of email):
+            passwordResetBodyHTML: "<!DOCTYPE html><html xmlns=http://www.w3.org/1999/xhtml>........"
         }
     };
 }
-
-console.log(ServerConfig);
 
 // Start Parse Server
 const api = new ParseServer(ServerConfig);

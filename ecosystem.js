@@ -28,6 +28,10 @@
         // You can use any arbitrary string. Keep it secret! For migrated apps, this should match your hosted Parse app.
         "MASTER_KEY": "myMasterKey",
         "MASTER_REST_KEY": "myMasterRestKey",
+
+        // Files save in Folder
+        //"UPLOAD_LOCAL_PATH": "/tmp",
+
         // Parse Dashboard
         "DASHBOARD_URL": "/dashboard",
         "DASHBOARD_USER": "admin",
