@@ -4,6 +4,7 @@ const cors           = require('cors');
 const ParseServer    = require('parse-server').ParseServer;
 const expressLayouts = require('express-ejs-layouts');
 const path           = require('path');
+const ParseDashboard = require('parse-dashboard');
 const FSFilesAdapter = require('parse-server-fs-adapter');
 const S3Adapter      = require('parse-server').S3Adapter;
 
@@ -139,6 +140,35 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => res.render('index'));
+
+// Parse Dashboard
+const DASHBOARD_URL      = process.env.DASHBOARD_URL;
+const DASHBOARD_USER     = process.env.DASHBOARD_USER;
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+if (DASHBOARD_USER) {
+    const dashboard = new ParseDashboard({
+        apps       : [
+            {
+                appName  : APP_NAME,
+                serverURL: SERVER_URL,
+                appId    : APP_ID,
+                masterKey: MASTER_KEY,
+                iconName : 'icon.png'
+            }
+        ],
+        users      : [
+            {
+                user: DASHBOARD_USER, // Used to log in to your Parse Dashboard
+                pass: DASHBOARD_PASSWORD
+            }
+        ],
+        iconsFolder: 'icons'
+    }, true);
+
+    // make the Parse Dashboard available at /dashboard
+    app.use(DASHBOARD_URL, dashboard);
+}
+
 
 const httpServer = require('http').createServer(app);
 httpServer.listen(PORT, () => console.log('parse-server-example running on port ' + PORT + '.'));
