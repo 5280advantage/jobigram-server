@@ -142,7 +142,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => res.render('index'));
 
 // Parse Dashboard
-const DASHBOARD_URL      = process.env.DASHBOARD_URL;
+const DASHBOARD_URL      = process.env.DASHBOARD_URL || "/dashboard";
 const DASHBOARD_USER     = process.env.DASHBOARD_USER;
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
 if (DASHBOARD_USER) {
