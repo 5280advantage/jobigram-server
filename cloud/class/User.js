@@ -852,7 +852,7 @@ function saveFacebookPicture(req, res, next) {
     if (!user) {
         return res.error('Not Authorized');
     }
-    let facebook = user.attributes.facebook;
+    let facebook = user.get('authData').facebook.id;
 
 
     if (!facebook) {
