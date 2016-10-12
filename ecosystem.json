@@ -18,7 +18,7 @@
         "DATABASE_URI": "mongodb://localhost:27017/photogram",
         // URL to your Parse Server (don't forget to specify http:// or https://).
         // This URL will be used when making requests to Parse Server from Cloud Code.
-        "SERVER_URL": "http://http://ec2-52-24-169-203.us-west-2.compute.amazonaws.com:8080/parse",
+        "SERVER_URL": "http://ec2-52-24-169-203.us-west-2.compute.amazonaws.com:8080/parse",
         // Your apps name. This will appear in the subject and body of the emails that are sent.
         "APP_NAME": "Photogram",
         // (required) - The application id to host with this server instance.
