@@ -143,8 +143,8 @@ app.get('/', (req, res) => res.render('index'));
 
 // Parse Dashboard
 const DASHBOARD_URL      = process.env.DASHBOARD_URL || "/dashboard";
-const DASHBOARD_USER     = process.env.DASHBOARD_USER;
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+const DASHBOARD_USER     = process.env.DASHBOARD_USER || "admin";
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || "admin123";
 if (DASHBOARD_USER) {
     const dashboard = new ParseDashboard({
         apps       : [
