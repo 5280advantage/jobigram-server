@@ -1,29 +1,30 @@
 'use strict';
-const _               = require('lodash');
-const Image           = require('./../helpers/image');
-const User            = require('./../class/User');
+const _ = require('lodash');
+const Image = require('./../helpers/image');
+const User = require('./../class/User');
 const GalleryActivity = require('./../class/GalleryActivity');
-const ParseObject     = Parse.Object.extend('Gallery');
-const GalleryAlbum    = Parse.Object.extend('GalleryAlbum');
-const UserFollow      = Parse.Object.extend('UserFollow');
-const MasterKey       = {useMasterKey: true};
+const ParseObject = Parse.Object.extend('Gallery');
+const GalleryAlbum = Parse.Object.extend('GalleryAlbum');
+const UserFollow = Parse.Object.extend('UserFollow');
+const MasterKey = {useMasterKey: true};
 
 module.exports = {
-    beforeSave    : beforeSave,
-    afterSave     : afterSave,
-    afterDelete   : afterDelete,
-    feed          : feed,
-    search        : search,
-    getAlbum      : getAlbum,
+    beforeSave: beforeSave,
+    afterSave: afterSave,
+    afterDelete: afterDelete,
+    feed: feed,
+    search: search,
+    getAlbum: getAlbum,
     commentGallery: commentGallery,
     isGalleryLiked: isGalleryLiked,
-    likeGallery   : likeGallery,
+    likeGallery: likeGallery,
+    applyGallery: applyGallery
 };
 
 
 function beforeSave(req, res) {
     const gallery = req.object;
-    const user    = req.user || req.object.get('user');
+    const user = req.user || req.object.get('user');
 
     if (!user) {
         return res.error('Not Authorized');
@@ -50,12 +51,12 @@ function beforeSave(req, res) {
     // Search Gallery
     //https://parse.com/docs/js/guide#performance-implement-efficient-searches
     let toLowerCase = w => w.toLowerCase();
-    var words       = gallery.get('title').split(/\b/);
-    words           = _.map(words, toLowerCase);
-    var stopWords   = ['the', 'in', 'and']
-    words           = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
-    var hashtags    = gallery.get('title').match(/#.+?\b/g);
-    hashtags        = _.map(hashtags, toLowerCase)
+    var words = gallery.get('title').split(/\b/);
+    words = _.map(words, toLowerCase);
+    var stopWords = ['the', 'in', 'and']
+    words = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
+    var hashtags = gallery.get('title').match(/#.+?\b/g);
+    hashtags = _.map(hashtags, toLowerCase)
 
     gallery.set('words', words);
     gallery.set('hashtags', hashtags);
@@ -127,7 +128,7 @@ function afterDelete(req, res) {
 
     if (req.object.album) {
         let decrementAlbum = new Parse.Query('GalleryAlbum').equalTo('objectId', req.object.album.id)
-                                                            .first(MasterKey).then(galleryAlbum => {
+            .first(MasterKey).then(galleryAlbum => {
                 return galleryAlbum.increment('qtyPhotos', -1).save(null, MasterKey)
             });
         promises.push(decrementAlbum);
@@ -160,10 +161,10 @@ function afterSave(req) {
 
     // Activity
     let activity = {
-        action  : 'addPhoto',
+        action: 'addPhoto',
         fromUser: user,
-        toUser  : req.object.user,
-        gallery : req.object
+        toUser: req.object.user,
+        gallery: req.object
     };
 
     User.incrementGallery(user);
@@ -172,7 +173,7 @@ function afterSave(req) {
 
 function commentGallery(req, res) {
     const params = req.params;
-    const _page  = req.params.page || 1;
+    const _page = req.params.page || 1;
     const _limit = req.params.limit || 10;
 
     new Parse.Query(ParseObject)
@@ -215,16 +216,16 @@ function commentGallery(req, res) {
                             }
 
                             let obj = {
-                                object   : itemComment,
-                                id       : itemComment.id,
+                                object: itemComment,
+                                id: itemComment.id,
                                 createdAt: itemComment.get('createdAt'),
-                                text     : itemComment.get('text'),
-                                user     : {
-                                    obj     : itemComment.get('user'),
+                                text: itemComment.get('text'),
+                                user: {
+                                    obj: itemComment.get('user'),
                                     username: user.get('username'),
-                                    name    : user.get('name'),
-                                    status  : user.get('status'),
-                                    photo   : user.get('photo')
+                                    name: user.get('name'),
+                                    status: user.get('status'),
+                                    photo: user.get('photo')
                                 }
                             };
                             console.log('Obj', obj);
@@ -241,7 +242,7 @@ function commentGallery(req, res) {
 
 function search(req, res, next) {
     const params = req.params;
-    const _page  = req.params.page || 1;
+    const _page = req.params.page || 1;
     const _limit = req.params.limit || 24;
 
     let _query = new Parse.Query(ParseObject);
@@ -250,14 +251,14 @@ function search(req, res, next) {
 
     if (text && text.length > 0) {
         let toLowerCase = w => w.toLowerCase();
-        let words       = text.split(/\b/);
-        words           = _.map(words, toLowerCase);
+        let words = text.split(/\b/);
+        words = _.map(words, toLowerCase);
 
         let stopWords = ['the', 'in', 'and']
-        words         = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
+        words = _.filter(words, w => w.match(/^\w+$/) && !_.includes(stopWords, w));
 
         let hashtags = text.match(/#.+?\b/g);
-        hashtags     = _.map(hashtags, toLowerCase);
+        hashtags = _.map(hashtags, toLowerCase);
 
         if (words) {
             _query.containsAll('words', [words]);
@@ -295,22 +296,22 @@ function search(req, res, next) {
                 }).then(user => {
 
                     let obj = {
-                        id           : itemGallery.id,
-                        galleryObj   : itemGallery,
-                        comments     : [],
-                        createdAt    : itemGallery.get('createdAt'),
-                        image        : itemGallery.get('image'),
-                        imageThumb   : itemGallery.get('imageThumb'),
-                        title        : itemGallery.get('title'),
+                        id: itemGallery.id,
+                        galleryObj: itemGallery,
+                        comments: [],
+                        createdAt: itemGallery.get('createdAt'),
+                        image: itemGallery.get('image'),
+                        imageThumb: itemGallery.get('imageThumb'),
+                        title: itemGallery.get('title'),
                         commentsTotal: itemGallery.get('commentsTotal') || 0,
-                        likesTotal   : itemGallery.get('likesTotal') || 0,
-                        isApproved   : itemGallery.get('isApproved'),
-                        user         : {
-                            obj     : itemGallery.get('user'),
-                            name    : user.get('name'),
+                        likesTotal: itemGallery.get('likesTotal') || 0,
+                        isApproved: itemGallery.get('isApproved'),
+                        user: {
+                            obj: itemGallery.get('user'),
+                            name: user.get('name'),
                             username: user.get('username'),
-                            status  : user.get('status'),
-                            photo   : user.get('photo')
+                            status: user.get('status'),
+                            photo: user.get('photo')
                         }
                     };
                     //console.log('Obj', obj);
@@ -335,14 +336,14 @@ function search(req, res, next) {
                                 .then(comments => {
                                     comments.map(function (comment) {
                                         obj.comments.push({
-                                            id  : comment.id,
-                                            obj : comment,
+                                            id: comment.id,
+                                            obj: comment,
                                             user: {
-                                                obj     : itemGallery.get('user'),
-                                                name    : user.get('name'),
+                                                obj: itemGallery.get('user'),
+                                                name: user.get('name'),
                                                 username: user.get('username'),
-                                                status  : user.get('status'),
-                                                photo   : user.get('photo')
+                                                status: user.get('status'),
+                                                photo: user.get('photo')
                                             },
                                             text: comment.get('text'),
                                         })
@@ -371,7 +372,7 @@ function getAlbum(req, res) {
                 .find(MasterKey)
                 .then(photos => {
                     let result = {
-                        album : album,
+                        album: album,
                         photos: photos
                     };
                     res.success(result);
@@ -382,7 +383,7 @@ function getAlbum(req, res) {
 
 function feed(req, res, next) {
     const params = req.params;
-    const _page  = req.params.page || 1;
+    const _page = req.params.page || 1;
     const _limit = req.params.limit || 24;
 
     let _query = new Parse.Query(ParseObject);
@@ -471,19 +472,19 @@ function feed(req, res, next) {
                     new Parse.Query('UserData').equalTo('user', userGet).first(MasterKey).then(user => {
 
                         let obj = {
-                            id           : itemGallery.id,
-                            obj          : itemGallery,
-                            comments     : [],
-                            album        : itemGallery.get('album'),
-                            createdAt    : itemGallery.get('createdAt'),
-                            image        : itemGallery.get('image'),
-                            imageThumb   : itemGallery.get('imageThumb'),
-                            location     : itemGallery.get('location'),
-                            title        : itemGallery.get('title'),
+                            id: itemGallery.id,
+                            obj: itemGallery,
+                            comments: [],
+                            album: itemGallery.get('album'),
+                            createdAt: itemGallery.get('createdAt'),
+                            image: itemGallery.get('image'),
+                            imageThumb: itemGallery.get('imageThumb'),
+                            location: itemGallery.get('location'),
+                            title: itemGallery.get('title'),
                             commentsTotal: itemGallery.get('commentsTotal') || 0,
-                            likesTotal   : itemGallery.get('likesTotal') || 0,
-                            isApproved   : itemGallery.get('isApproved'),
-                            user         : itemGallery.get('user')
+                            likesTotal: itemGallery.get('likesTotal') || 0,
+                            isApproved: itemGallery.get('isApproved'),
+                            user: itemGallery.get('user')
                         };
                         //console.log('Obj', obj);
 
@@ -503,8 +504,8 @@ function feed(req, res, next) {
                                     .then(comments => {
                                         comments.map(function (comment) {
                                             obj.comments.push({
-                                                id  : comment.id,
-                                                obj : comment,
+                                                id: comment.id,
+                                                obj: comment,
                                                 user: itemGallery.get('user'),
                                                 text: comment.get('text'),
                                             })
@@ -523,7 +524,7 @@ function feed(req, res, next) {
 }
 
 function likeGallery(req, res, next) {
-    const user      = req.user;
+    const user = req.user;
     const galleryId = req.params.galleryId;
 
     if (!user) {
@@ -560,9 +561,9 @@ function likeGallery(req, res, next) {
 
         activity = {
             fromUser: user,
-            gallery : objParse,
-            action  : response.action,
-            toUser  : objParse.attributes.user
+            gallery: objParse,
+            action: response.action,
+            toUser: objParse.attributes.user
         };
 
         console.log('step4', activity);
@@ -576,7 +577,7 @@ function likeGallery(req, res, next) {
 }
 
 function isGalleryLiked(req, res, next) {
-    const user      = req.user;
+    const user = req.user;
     const galleryId = req.params.galleryId;
 
     if (!user) {
@@ -590,3 +591,58 @@ function isGalleryLiked(req, res, next) {
         .then(gallery => res.success(gallery ? true : false), error => res.error(error.message));
 }
 
+
+
+function applyGallery(req, res, next) {
+
+    const user = req.user;
+    const galleryId = req.params.galleryId;
+
+    if (!user) {
+        return res.error('Not Authorized');
+    }
+
+    let objParse;
+    let activity;
+    let response = {action: null};
+
+    new Parse.Query('Gallery').get(galleryId).then(gallery => {
+        objParse = gallery;
+        return new Parse.Query('Gallery')
+            .equalTo('likes', user)
+            .equalTo('objectId', galleryId)
+            .find();
+    }).then(result => {
+
+        console.log('step1', result);
+        let relation = objParse.relation('likes');
+
+        console.log('step2', relation);
+        console.log('step3', relation.length);
+
+        if (result && result.length > 0) {
+            objParse.increment('likesTotal', -1);
+            relation.remove(user);
+            response.action = 'unlike';
+        } else {
+            objParse.increment('likesTotal');
+            relation.add(user);
+            response.action = 'like';
+        }
+
+        activity = {
+            fromUser: user,
+            gallery: objParse,
+            action: response.action,
+            toUser: objParse.attributes.user
+        };
+
+        console.log('step4', activity);
+
+        return objParse.save(null, MasterKey);
+
+    }).then(data => {
+        GalleryActivity.create(activity);
+        res.success(response);
+    }, error => res.error);
+}
