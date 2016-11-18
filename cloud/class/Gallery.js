@@ -17,7 +17,8 @@ module.exports = {
     getAlbum      : getAlbum,
     commentGallery: commentGallery,
     isGalleryLiked: isGalleryLiked,
-    likeGallery   : likeGallery,
+    saveGallery   : saveGallery,
+    applyGallery   : applyGallery,
 };
 
 
@@ -522,7 +523,7 @@ function feed(req, res, next) {
     }
 }
 
-function likeGallery(req, res, next) {
+function applyGallery(req, res, next) {
     const user      = req.user;
     const galleryId = req.params.galleryId;
 
@@ -588,5 +589,59 @@ function isGalleryLiked(req, res, next) {
         .equalTo('objectId', galleryId)
         .first(MasterKey)
         .then(gallery => res.success(gallery ? true : false), error => res.error(error.message));
+}
+
+
+function saveGallery(req, res, next) {
+    const user      = req.user;
+    const galleryId = req.params.galleryId;
+
+    if (!user) {
+        return res.error('Not Authorized');
+    }
+
+    let objParse;
+    let activity;
+    let response = {action: null};
+
+    new Parse.Query('Gallery').get(galleryId).then(gallery => {
+        objParse = gallery;
+        return new Parse.Query('Gallery')
+            .equalTo('likes', user)
+            .equalTo('objectId', galleryId)
+            .find();
+    }).then(result => {
+
+        console.log('step1', result);
+        let relation = objParse.relation('likes');
+
+        console.log('step2', relation);
+        console.log('step3', relation.length);
+
+        if (result && result.length > 0) {
+            objParse.increment('likesTotal', -1);
+            relation.remove(user);
+            response.action = 'unlike';
+        } else {
+            objParse.increment('likesTotal');
+            relation.add(user);
+            response.action = 'like';
+        }
+
+        activity = {
+            fromUser: user,
+            gallery : objParse,
+            action  : response.action,
+            toUser  : objParse.attributes.user
+        };
+
+        console.log('step4', activity);
+
+        return objParse.save(null, MasterKey);
+
+    }).then(data => {
+        GalleryActivity.create(activity);
+        res.success(response);
+    }, error => res.error);
 }
 
